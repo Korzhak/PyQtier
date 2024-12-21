@@ -3,7 +3,7 @@
 Utility for running PyQtier desktop applications.
 """
 
-from core.controller import Controller
+from controllers.controller import Controller
 
 
 def main():

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from configparser import ConfigParser
 
-from core import auxiliary
+import auxiliary
 
 
-class Settings(object):
+class SettingsModel(object):
     def __init__(self):
         self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS
         self._config.read(auxiliary.CONFIG_FILE_PATH)
-        self.__load_configs()
+        self.load_configs()
 
-    def __load_configs(self) -> None:
+    def load_configs(self) -> None:
         """
         Load configuration from file
         :return: None
@@ -24,7 +24,7 @@ class Settings(object):
         except KeyError as err:
             raise KeyError(f"Key '{err}' does not exist in config file")
 
-    def __update_config_file(self) -> None:
+    def update_config_file(self) -> None:
         """
         Update configuration or create new config file
         :return: None
@@ -62,7 +62,7 @@ class Settings(object):
         :return: None
         """
         self._config.set("UI", "main_window_size", f"{width}x{height}")
-        self.__update_config_file()
+        self.update_config_file()
 
     def set_main_window_position(self, x, y) -> None:
         """
@@ -72,7 +72,7 @@ class Settings(object):
         :return: None
         """
         self._config.set("UI", "main_window_position", f"{x},{y}")
-        self.__update_config_file()
+        self.update_config_file()
 
     # START YOUR OWN SETTER METHODS
 
