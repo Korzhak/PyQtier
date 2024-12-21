@@ -9,6 +9,10 @@ class SettingsModel(object):
         self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS
         self._config.read(auxiliary.CONFIG_FILE_PATH)
+
+        # Sections
+        self.__ui = None
+
         self.load_configs()
 
     def load_configs(self) -> None:
@@ -20,7 +24,7 @@ class SettingsModel(object):
             for section in auxiliary.CONFIG_SECTIONS:
                 if section not in self._config.sections():
                     self._config.add_section(section)
-            self._ui = self._config["UI"]
+            self.__ui = self._config["UI"]
         except KeyError as err:
             raise KeyError(f"Key '{err}' does not exist in config file")
 
@@ -37,22 +41,16 @@ class SettingsModel(object):
         """
         :return: tuple (width, height)
         """
-        return tuple(map(int, self._ui.get("main_window_size",
-                                           fallback=self._defaults["main_window_size"]).split('x')))
+        return tuple(map(int, self.__ui.get("main_window_size",
+                                            fallback=self._defaults["main_window_size"]).split('x')))
 
     @property
     def main_window_position(self) -> tuple:
         """
         :return: tuple (x, y)
         """
-        return tuple(map(int, self._ui.get("main_window_position",
-                                           fallback=self._defaults["main_window_position"]).split(",")))
-
-    # START YOUR OWN GETTER METHODS
-
-    ...
-
-    # END YOUR OWN GETTER METHODS
+        return tuple(map(int, self.__ui.get("main_window_position",
+                                            fallback=self._defaults["main_window_position"]).split(",")))
 
     def set_main_window_size(self, width, height) -> None:
         """
@@ -73,9 +71,3 @@ class SettingsModel(object):
         """
         self._config.set("UI", "main_window_position", f"{x},{y}")
         self.update_config_file()
-
-    # START YOUR OWN SETTER METHODS
-
-    ...
-
-    # END YOUR OWN SETTER METHODS

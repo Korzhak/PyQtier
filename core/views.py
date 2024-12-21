@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import types
+
 from PyQt5 import QtWidgets
 
 from templates.main_window_interface import Ui_MainWindow
@@ -54,32 +56,32 @@ class AbstractMainWindowView(Ui_MainWindow):
     def __init__(self, main_window_widget, settings, settings_view):
         super(AbstractMainWindowView, self).__init__()
 
-        self.__main_window_widget = main_window_widget
-        self.__settings = settings
+        self.main_window_widget = main_window_widget
+        self.settings = settings
 
-        self.__settings_widget = QtWidgets.QWidget()
-        self.__settings_window = settings_view(self.__settings_widget)
-        # YOUR CODE START
-        ...
-        # YOUR CODE END
+        self.settings_widget = QtWidgets.QWidget()
+        self.settings_window = settings_view(self.settings_widget)
 
-        self.setupUi(self.__main_window_widget)
+        # Змінюємо метод closeEvent для вікна
+        self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
+
+        self.setupUi(self.main_window_widget)
         self.add_behaviour()
 
     def load_config(self):
         # Size and position for main window
-        w, h = self.__settings.main_window_size
-        x, y = self.__settings.main_window_position
-        self.__main_window_widget.resize(w, h)
-        self.__main_window_widget.move(x, y)
+        w, h = self.settings.main_window_size
+        x, y = self.settings.main_window_position
+        self.main_window_widget.resize(w, h)
+        self.main_window_widget.move(x, y)
 
     def save_settings(self):
         # Size and position for main window
-        self.__settings.set_main_window_size(self.__main_window_widget.size().width(),
-                                             self.__main_window_widget.size().height())
+        self.settings.set_main_window_size(self.main_window_widget.size().width(),
+                                           self.main_window_widget.size().height())
 
-        self.__settings.set_main_window_position(self.__main_window_widget.pos().x(),
-                                                 self.__main_window_widget.pos().y())
+        self.settings.set_main_window_position(self.main_window_widget.pos().x(),
+                                               self.main_window_widget.pos().y())
 
     def add_behaviour(self):
         """
@@ -93,16 +95,13 @@ class AbstractMainWindowView(Ui_MainWindow):
         # END YOUR CODE
 
     def show_settings_window(self):
-        self.__settings_window.open()
+        self.settings_window.open()
 
-    def quit(self):
+    def quit(self, window, event):
         """
         Callback for behaviour when window is closing
         return: ...
         """
-        # START YOUR CODE
-        ...
-        # END YOUR CODE
-        if self.__settings_window.is_opened:
-            return
-        QtWidgets.qApp.quit()
+        if self.settings_window.is_opened:
+            self.settings_window.quit()
+        event.accept()
