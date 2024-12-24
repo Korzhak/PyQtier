@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets
 
 from templates.main_window_interface import Ui_MainWindow
 from templates.settings_interface import Ui_Settings
+from .widgets import WidgetManager
 
 
 class AbstractSettingsView(Ui_Settings):
@@ -57,6 +58,9 @@ class AbstractMainWindowView(Ui_MainWindow):
         super(AbstractMainWindowView, self).__init__()
 
         self.main_window_widget = main_window_widget
+
+        self.widget_manager = WidgetManager(self)
+
         self.settings = settings
 
         self.settings_widget = QtWidgets.QWidget()
@@ -67,6 +71,11 @@ class AbstractMainWindowView(Ui_MainWindow):
 
         self.setupUi(self.main_window_widget)
         self.add_behaviour()
+        self.add_widgets()
+
+    def add_widgets(self):
+        # Додавання віджетів
+        ...
 
     def load_config(self):
         # Size and position for main window
@@ -88,7 +97,6 @@ class AbstractMainWindowView(Ui_MainWindow):
         Add callbacks
         :return: None
         """
-        self.actionSettings.triggered.connect(self.show_settings_window)
         self.actionQuit.triggered.connect(self.quit)
         # START YOUR CODE
         ...

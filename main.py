@@ -4,6 +4,7 @@ Utility for running PyQtier desktop applications.
 """
 
 from controllers.controller import Controller
+from controllers.widgets import *
 
 
 def main():
