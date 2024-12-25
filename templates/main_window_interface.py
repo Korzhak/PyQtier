@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\gui\ui\main_window_interface.ui'
+# Form implementation generated from reading ui file 'templates/ui/main_window_interface.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -17,9 +17,12 @@ class Ui_MainWindow(object):
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        self.bt1 = QtWidgets.QPushButton(self.centralwidget)
+        self.bt1.setGeometry(QtCore.QRect(310, 110, 113, 32))
+        self.bt1.setObjectName("bt1")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -42,6 +45,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "PyQtier Main Window"))
+        self.bt1.setText(_translate("MainWindow", "PushButton"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))

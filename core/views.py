@@ -5,15 +5,15 @@ import types
 from PyQt5 import QtWidgets
 
 from templates.main_window_interface import Ui_MainWindow
-from templates.settings_interface import Ui_Settings
-from .widgets import WidgetManager
+from templates.simple_interface import Ui_SimpleView
+from .widgets import WindowWidgetManager
 
 
-class AbstractSettingsView(Ui_Settings):
-    def __init__(self, widget: QtWidgets.QWidget):
-        super(AbstractSettingsView, self).__init__()
-        self.widget = widget
-        self.setupUi(widget)
+class AbstractSimpleView(Ui_SimpleView):
+    def __init__(self):
+        super(AbstractSimpleView, self).__init__()
+        self.widget = QtWidgets.QWidget()
+        self.setupUi(self.widget)
 
         self.__is_opened = False
 
@@ -54,17 +54,16 @@ class AbstractSettingsView(Ui_Settings):
 
 
 class AbstractMainWindowView(Ui_MainWindow):
-    def __init__(self, main_window_widget, settings, settings_view):
+    def __init__(self, main_window_widget, settings):
         super(AbstractMainWindowView, self).__init__()
 
         self.main_window_widget = main_window_widget
 
-        self.widget_manager = WidgetManager(self)
+        self.widget_manager = WindowWidgetManager(self)
 
         self.settings = settings
 
         self.settings_widget = QtWidgets.QWidget()
-        self.settings_window = settings_view(self.settings_widget)
 
         # Змінюємо метод closeEvent для вікна
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
@@ -102,14 +101,9 @@ class AbstractMainWindowView(Ui_MainWindow):
         ...
         # END YOUR CODE
 
-    def show_settings_window(self):
-        self.settings_window.open()
-
     def quit(self, window, event):
         """
         Callback for behaviour when window is closing
         return: ...
         """
-        if self.settings_window.is_opened:
-            self.settings_window.quit()
         event.accept()

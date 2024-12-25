@@ -9,7 +9,7 @@ class WidgetRegistry:
         return decorator
 
     @classmethod
-    def create_widget(cls, widget_id: str, parent=None):
+    def create_widget(cls, widget_id: str):
         if widget_id not in cls._widgets:
             raise ValueError(f"Widget {widget_id} not found")
-        return cls._widgets[widget_id](parent)
+        return cls._widgets[widget_id]()
