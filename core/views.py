@@ -9,11 +9,17 @@ from templates.simple_interface import Ui_SimpleView
 from .widgets import WindowWidgetManager
 
 
-class AbstractSimpleView(Ui_SimpleView):
-    def __init__(self):
-        super(AbstractSimpleView, self).__init__()
-        self.widget = QtWidgets.QWidget()
-        self.setupUi(self.widget)
+class AbstractSimpleView:
+    def __init__(self, ui=None, widget=None):
+        if not widget:
+            self.widget = widget
+        else:
+            self.widget = QtWidgets.QWidget()
+        if not ui:
+            self.ui = ui
+        else:
+            self.ui = Ui_SimpleView()
+        self.ui.setupUi(self.widget)
 
         self.__is_opened = False
 
@@ -24,9 +30,6 @@ class AbstractSimpleView(Ui_SimpleView):
         Add callbacks
         :return: None
         """
-        # START YOUR CODE
-        ...
-        # END YOUR CODE
 
     def open(self):
         """
@@ -58,23 +61,15 @@ class AbstractMainWindowView(Ui_MainWindow):
         super(AbstractMainWindowView, self).__init__()
 
         self.main_window_widget = main_window_widget
+        self.settings = settings
 
         self.widget_manager = WindowWidgetManager(self)
 
-        self.settings = settings
-
-        self.settings_widget = QtWidgets.QWidget()
-
-        # Змінюємо метод closeEvent для вікна
+        # Change closeEvent method to custom
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
 
         self.setupUi(self.main_window_widget)
         self.add_behaviour()
-        self.add_widgets()
-
-    def add_widgets(self):
-        # Додавання віджетів
-        ...
 
     def load_config(self):
         # Size and position for main window
@@ -97,9 +92,6 @@ class AbstractMainWindowView(Ui_MainWindow):
         :return: None
         """
         self.actionQuit.triggered.connect(self.quit)
-        # START YOUR CODE
-        ...
-        # END YOUR CODE
 
     def quit(self, window, event):
         """

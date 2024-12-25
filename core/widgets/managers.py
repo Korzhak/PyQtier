@@ -51,6 +51,8 @@ class WindowWidgetManager(WidgetManager):
                 self.opened_windows[widget_id] = widget
                 widget.open()
 
+        print(self.opened_windows)
+
     def close_widget(self, widget_id: str):
         """Закрити окреме вікно віджета"""
         if widget_id in self.opened_windows:
