@@ -5,28 +5,42 @@ import types
 from PyQt5 import QtWidgets
 
 from core.templates.main_window_interface import Ui_MainWindow
-from core.templates.simple_interface import Ui_SimpleView
 
 
 class AbstractSimpleView:
-    def __init__(self, ui=None, widget=None):
+    def __init__(self):
+        self.settings = None
+        self.settings_id = None
         self.ui = None
         self.widget = None
         self.__is_opened = False
 
-    def setup_view(self, ui=None, widget=None):
-        if widget:
-            self.widget = widget
-        else:
-            self.widget = QtWidgets.QWidget()
-        if ui:
-            self.ui = ui()
-        else:
-            self.ui = Ui_SimpleView()
+    def setup_view(self, ui=None, settings=None, widget=None, settings_id: str = "", ):
+        self.widget = widget if widget else QtWidgets.QWidget()
 
+        self.settings_id = settings_id if settings_id else self.__class__.__name__
+
+        self.ui = ui()
+        self.settings = settings(self.settings_id)
         self.ui.setupUi(self.widget)
-
         self.add_behaviour()
+
+    def load_config(self):
+        # Size and position for main window
+        w, h = self.settings.window_size
+        x, y = self.settings.window_position
+        if w and h:
+            self.ui.resize(w, h)
+        if x and y:
+            self.ui.move(x, y)
+
+    def save_settings(self):
+        # Size and position for main window
+        self.settings.set_window_size(self.ui.size().width(),
+                                      self.ui.size().height())
+
+        self.settings.set_window_position(self.ui.pos().x(),
+                                          self.ui.pos().y())
 
     def add_behaviour(self):
         """
@@ -39,6 +53,7 @@ class AbstractSimpleView:
         Open the settings window
         :return: None
         """
+        self.load_config()
         self.widget.show()
         self.__is_opened = True
 
@@ -47,6 +62,7 @@ class AbstractSimpleView:
         Close the settings window
         :return: None
         """
+        self.save_settings()
         self.widget.close()
         self.__is_opened = False
 
@@ -60,6 +76,8 @@ class AbstractSimpleView:
 
 
 class AbstractMainWindowView(Ui_MainWindow):
+    _callbacks = {}
+
     def __init__(self, main_window_widget, settings):
         super(AbstractMainWindowView, self).__init__()
 
@@ -70,23 +88,33 @@ class AbstractMainWindowView(Ui_MainWindow):
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
 
         self.setupUi(self.main_window_widget)
-        self.add_behaviour()
         self.load_config()
+
+    def register_callback(self, callback_id: str, callback_func: callable):
+        self._callbacks[callback_id] = callback_func
+
+    def get_callback(self, callback_id: str):
+        return self._callbacks[callback_id]
+
+    def remove_callback(self, callback_id: str):
+        ...
 
     def load_config(self):
         # Size and position for main window
-        w, h = self.settings.main_window_size
-        x, y = self.settings.main_window_position
-        self.main_window_widget.resize(w, h)
-        self.main_window_widget.move(x, y)
+        w, h = self.settings.window_size
+        x, y = self.settings.window_position
+        if w and h:
+            self.main_window_widget.resize(w, h)
+        if x and y:
+            self.main_window_widget.move(x, y)
 
     def save_settings(self):
         # Size and position for main window
-        self.settings.set_main_window_size(self.main_window_widget.size().width(),
-                                           self.main_window_widget.size().height())
+        self.settings.set_window_size(self.main_window_widget.size().width(),
+                                      self.main_window_widget.size().height())
 
-        self.settings.set_main_window_position(self.main_window_widget.pos().x(),
-                                               self.main_window_widget.pos().y())
+        self.settings.set_window_position(self.main_window_widget.pos().x(),
+                                          self.main_window_widget.pos().y())
 
     def add_behaviour(self):
         """

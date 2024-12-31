@@ -5,13 +5,15 @@ from . import auxiliary
 
 
 class PyQtierSettingsModel(object):
-    def __init__(self):
+    def __init__(self, settings_id: str = "main"):
         self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS
         self._config.read(auxiliary.CONFIG_FILE_PATH)
 
         # Sections
         self.__ui = None
+
+        self._settings_id = settings_id
 
         self.load_configs()
 
@@ -36,38 +38,55 @@ class PyQtierSettingsModel(object):
         with open(auxiliary.CONFIG_FILE_PATH, 'w') as configfile:
             self._config.write(configfile)
 
+    def get_default(self, key: str, if_none: str = ""):
+        if key in self._defaults:
+            return self._defaults[key]
+        return if_none
+
     @property
-    def main_window_size(self) -> tuple:
+    def settings_id_for_config(self) -> str:
+        return self._settings_id + "_" if self._settings_id else ""
+
+    @property
+    def settings_id(self) -> str:
+        return self._settings_id
+
+    @property
+    def window_size(self) -> tuple:
         """
         :return: tuple (width, height)
         """
-        return tuple(map(int, self.__ui.get("main_window_size",
-                                            fallback=self._defaults["main_window_size"]).split('x')))
+        return tuple(map(int, self.__ui.get(
+            self.settings_id_for_config + "window_size",
+            fallback=self.get_default(self.settings_id_for_config + "window_size", if_none="0x0")
+        ).split('x')))
 
     @property
-    def main_window_position(self) -> tuple:
+    def window_position(self) -> tuple:
         """
         :return: tuple (x, y)
         """
-        return tuple(map(int, self.__ui.get("main_window_position",
-                                            fallback=self._defaults["main_window_position"]).split(",")))
+        return tuple(map(int, self.__ui.get(
+            self.settings_id_for_config + "window_position",
+            fallback=self.get_default(self.settings_id_for_config + "window_position", if_none="0,0")
+        ).split(",")))
 
-    def set_main_window_size(self, width, height) -> None:
+    def set_window_size(self, width, height) -> None:
         """
         Saving main window size parameters
         :param width: width of main window (px)
         :param height: height of main window (px)
         :return: None
         """
-        self._config.set("UI", "main_window_size", f"{width}x{height}")
+        self._config.set("UI", self.settings_id_for_config + "window_size", f"{width}x{height}")
         self.update_config_file()
 
-    def set_main_window_position(self, x, y) -> None:
+    def set_window_position(self, x, y) -> None:
         """
         Saving main window position parameters
         :param x: x position of main window (px)
         :param y: y position of main window (px)
         :return: None
         """
-        self._config.set("UI", "main_window_position", f"{x},{y}")
+        self._config.set("UI", self.settings_id_for_config + "window_position", f"{x},{y}")
         self.update_config_file()

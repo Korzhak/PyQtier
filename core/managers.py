@@ -11,9 +11,11 @@ class PyQtierWindowsManager:
         self.app = QtWidgets.QApplication(sys.argv)
         self.main_window_widget = QtWidgets.QMainWindow()
         self.main_window = None
+
         self.widget_registry = WidgetRegistry()
-        self.setup_manager()
         self.widget_registry.create_registered_widgets()
+
+        self.setup_manager()
         self.setup_windows_widgets()
 
     def setup_manager(self):
