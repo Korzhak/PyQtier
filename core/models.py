@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from configparser import ConfigParser
 
-import auxiliary
 
-
-class SettingsModel(object):
+class PyQtierSettingsModel(object):
     def __init__(self):
         self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS

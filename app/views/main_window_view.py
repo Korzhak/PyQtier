@@ -1,19 +1,17 @@
 from core.models import SettingsModel
 from core.views import AbstractMainWindowView
+from core.widgets.registry import WidgetRegistry
 
 
+@WidgetRegistry.register('main_window_view')
 class MainWindowView(AbstractMainWindowView):
     def __init__(self, main_window_widget, settings: SettingsModel):
         super(MainWindowView, self).__init__(main_window_widget, settings)
         self.add_behaviour()
-        self.add_widgets()
-
-    def add_widgets(self):
-        self.widget_manager.add_widget("custom_widget")
 
     def add_behaviour(self):
         super(MainWindowView, self).add_behaviour()
         self.bt1.clicked.connect(self.bt1_clicked)
 
     def bt1_clicked(self):
-        self.widget_manager.show_widget('custom_widget')
+        ...

@@ -4,9 +4,8 @@ import types
 
 from PyQt5 import QtWidgets
 
-from templates.main_window_interface import Ui_MainWindow
-from templates.simple_interface import Ui_SimpleView
-from .widgets import WindowWidgetManager
+from app.templates.main_window_interface import Ui_MainWindow
+from app.templates.simple_interface import Ui_SimpleView
 
 
 class AbstractSimpleView:
@@ -62,8 +61,6 @@ class AbstractMainWindowView(Ui_MainWindow):
 
         self.main_window_widget = main_window_widget
         self.settings = settings
-
-        self.widget_manager = WindowWidgetManager(self)
 
         # Change closeEvent method to custom
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)

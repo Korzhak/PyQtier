@@ -3,8 +3,8 @@
 Utility for running PyQtier desktop applications.
 """
 
-from controllers.controller import Controller
-from controllers.widgets import *
+from app.windows_manager import WindowsManager
+from core.widgets.registry import WidgetRegistry
 
 
 def main():
@@ -12,8 +12,8 @@ def main():
         from PyQt5 import QtCore
     except ImportError as exc:
         raise ImportError("Couldn't import PyQt5. Are you sure it's installed?") from exc
-    c = Controller()
-    c.show_ui()
+    wm = WindowsManager()
+    wm.show_ui()
 
 
 if __name__ == '__main__':
