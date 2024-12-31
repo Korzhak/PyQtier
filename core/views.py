@@ -4,23 +4,27 @@ import types
 
 from PyQt5 import QtWidgets
 
-from app.templates.main_window_interface import Ui_MainWindow
-from app.templates.simple_interface import Ui_SimpleView
+from core.templates.main_window_interface import Ui_MainWindow
+from core.templates.simple_interface import Ui_SimpleView
 
 
 class AbstractSimpleView:
     def __init__(self, ui=None, widget=None):
-        if not widget:
+        self.ui = None
+        self.widget = None
+        self.__is_opened = False
+
+    def setup_view(self, ui=None, widget=None):
+        if widget:
             self.widget = widget
         else:
             self.widget = QtWidgets.QWidget()
-        if not ui:
-            self.ui = ui
+        if ui:
+            self.ui = ui()
         else:
             self.ui = Ui_SimpleView()
-        self.ui.setupUi(self.widget)
 
-        self.__is_opened = False
+        self.ui.setupUi(self.widget)
 
         self.add_behaviour()
 
@@ -60,13 +64,14 @@ class AbstractMainWindowView(Ui_MainWindow):
         super(AbstractMainWindowView, self).__init__()
 
         self.main_window_widget = main_window_widget
-        self.settings = settings
+        self.settings = settings()
 
         # Change closeEvent method to custom
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
 
         self.setupUi(self.main_window_widget)
         self.add_behaviour()
+        self.load_config()
 
     def load_config(self):
         # Size and position for main window
@@ -95,4 +100,5 @@ class AbstractMainWindowView(Ui_MainWindow):
         Callback for behaviour when window is closing
         return: ...
         """
+        self.save_settings()
         event.accept()

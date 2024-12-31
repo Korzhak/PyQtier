@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from configparser import ConfigParser
 
+from . import auxiliary
+
 
 class PyQtierSettingsModel(object):
     def __init__(self):

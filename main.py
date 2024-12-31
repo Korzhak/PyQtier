@@ -4,7 +4,6 @@ Utility for running PyQtier desktop applications.
 """
 
 from app.windows_manager import WindowsManager
-from core.widgets.registry import WidgetRegistry
 
 
 def main():

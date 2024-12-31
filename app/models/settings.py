@@ -1,6 +1,6 @@
-from core.models import SettingsModel
+from core.models import PyQtierSettingsModel
 
 
-class Settings(SettingsModel):
+class SettingsModel(PyQtierSettingsModel):
     def __init__(self):
-        super(Settings, self).__init__()
+        super(SettingsModel, self).__init__()

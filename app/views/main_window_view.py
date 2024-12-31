@@ -1,11 +1,8 @@
-from core.models import SettingsModel
 from core.views import AbstractMainWindowView
-from core.widgets.registry import WidgetRegistry
 
 
-@WidgetRegistry.register('main_window_view')
 class MainWindowView(AbstractMainWindowView):
-    def __init__(self, main_window_widget, settings: SettingsModel):
+    def __init__(self, main_window_widget, settings):
         super(MainWindowView, self).__init__(main_window_widget, settings)
         self.add_behaviour()
 
