@@ -15,12 +15,13 @@ class AbstractSimpleView:
         self.widget = None
         self.__is_opened = False
 
-    def setup_view(self, ui=None, settings=None, widget=None, settings_id: str = "", ):
+    def setup_view(self, ui=None, settings=None, widget=None, settings_id: str = ""):
         self.widget = widget if widget else QtWidgets.QWidget()
 
         self.settings_id = settings_id if settings_id else self.__class__.__name__
 
         self.ui = ui()
+        self.ui.closeEvent = types.MethodType(self.quit, self.widget)
         self.settings = settings(self.settings_id)
         self.ui.setupUi(self.widget)
         self.add_behaviour()
@@ -57,7 +58,7 @@ class AbstractSimpleView:
         self.widget.show()
         self.__is_opened = True
 
-    def quit(self):
+    def quit(self, event):
         """
         Close the settings window
         :return: None
@@ -65,6 +66,7 @@ class AbstractSimpleView:
         self.save_settings()
         self.widget.close()
         self.__is_opened = False
+        event.accept()
 
     @property
     def is_opened(self):
