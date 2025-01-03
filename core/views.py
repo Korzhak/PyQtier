@@ -21,7 +21,7 @@ class AbstractSimpleView:
         self.settings_id = settings_id if settings_id else self.__class__.__name__
 
         self.ui = ui()
-        self.ui.closeEvent = types.MethodType(self.quit, self.widget)
+        self.widget.closeEvent = types.MethodType(self.quit, self.widget)
         self.settings = settings(self.settings_id)
         self.ui.setupUi(self.widget)
         self.add_behaviour()
@@ -31,17 +31,17 @@ class AbstractSimpleView:
         w, h = self.settings.window_size
         x, y = self.settings.window_position
         if w and h:
-            self.ui.resize(w, h)
+            self.widget.resize(w, h)
         if x and y:
-            self.ui.move(x, y)
+            self.widget.move(x, y)
 
     def save_settings(self):
         # Size and position for main window
-        self.settings.set_window_size(self.ui.size().width(),
-                                      self.ui.size().height())
+        self.settings.set_window_size(self.widget.size().width(),
+                                      self.widget.size().height())
 
-        self.settings.set_window_position(self.ui.pos().x(),
-                                          self.ui.pos().y())
+        self.settings.set_window_position(self.widget.pos().x(),
+                                          self.widget.pos().y())
 
     def add_behaviour(self):
         """
@@ -58,7 +58,7 @@ class AbstractSimpleView:
         self.widget.show()
         self.__is_opened = True
 
-    def quit(self, event):
+    def quit(self, window, event):
         """
         Close the settings window
         :return: None
@@ -84,7 +84,7 @@ class AbstractMainWindowView(Ui_MainWindow):
         super(AbstractMainWindowView, self).__init__()
 
         self.main_window_widget = main_window_widget
-        self.settings = settings()
+        self.settings = settings(settings_id="main")
 
         # Change closeEvent method to custom
         self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
