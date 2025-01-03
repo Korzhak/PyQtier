@@ -5,8 +5,9 @@ from . import auxiliary
 
 
 class PyQtierSettingsModel(object):
+    _config = ConfigParser()
+
     def __init__(self, settings_id: str = "main"):
-        self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS
         self._config.read(auxiliary.CONFIG_FILE_PATH)
 
