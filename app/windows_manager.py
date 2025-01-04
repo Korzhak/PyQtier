@@ -2,11 +2,12 @@
 from app.models import SettingsModel
 from app.views import MainWindowView
 from core import PyQtierWindowsManager
+from core.templates.main_window_interface import Ui_MainWindow
 
 
 class WindowsManager(PyQtierWindowsManager):
     def setup_manager(self):
-        self.setup_main_window(MainWindowView, SettingsModel)
+        self.setup_main_window(Ui_MainWindow, MainWindowView, SettingsModel)
 
         self.custom_window = self.widget_registry.get_initialized_widget('custom_widget')
         self.settings_window = self.widget_registry.get_initialized_widget('settings_widget')

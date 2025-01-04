@@ -4,10 +4,10 @@ import types
 
 from PyQt5 import QtWidgets
 
-from core.templates.main_window_interface import Ui_MainWindow
 
+class AbstractView:
+    _callbacks = {}
 
-class AbstractSimpleView:
     def __init__(self):
         self.settings = None
         self.settings_id = None
@@ -26,8 +26,30 @@ class AbstractSimpleView:
         self.ui.setupUi(self.widget)
         self.add_behaviour()
 
+    def add_behaviour(self):
+        """
+        Add callbacks
+        :return: None
+        """
+
+    def register_callback(self, callback_id: str, callback_func: callable) -> None:
+        self._callbacks[callback_id] = callback_func
+
+    def get_callback(self, callback_id: str) -> callable:
+        return self._callbacks[callback_id]
+
+    def remove_callback(self, callback_id: str) -> None:
+        if callback_id in self._callbacks:
+            del self._callbacks[callback_id]
+
     def load_config(self):
-        # Size and position for main window
+        """
+
+        :return:
+        """
+        if not self.settings:
+            raise Exception("Settings not loaded")
+
         if self.settings.is_maximized:
             self.widget.showMaximized()
         else:
@@ -43,6 +65,9 @@ class AbstractSimpleView:
 
         :return:
         """
+        if not self.settings:
+            raise Exception("Settings not loaded")
+
         is_maximized = self.widget.isMaximized()
         self.settings.set_maximized(is_maximized)
         if not is_maximized:
@@ -51,12 +76,6 @@ class AbstractSimpleView:
 
             self.settings.set_window_position(self.widget.pos().x(),
                                               self.widget.pos().y())
-
-    def add_behaviour(self):
-        """
-        Add callbacks
-        :return: None
-        """
 
     def open(self):
         """
@@ -69,12 +88,10 @@ class AbstractSimpleView:
 
     def quit(self, window, event):
         """
-        Close the settings window
-        :return: None
+        Callback for behaviour when window is closing
+        return: ...
         """
         self.save_settings()
-        self.widget.close()
-        self.__is_opened = False
         event.accept()
 
     @property
@@ -86,64 +103,22 @@ class AbstractSimpleView:
         return self.__is_opened
 
 
-class AbstractMainWindowView(Ui_MainWindow):
-    _callbacks = {}
+class PyQtierSimpleView(AbstractView):
+    def quit(self, window, event):
+        """
+        Close the settings window
+        :return: None
+        """
+        self.save_settings()
+        self.widget.close()
+        self.__is_opened = False
+        event.accept()
 
-    def __init__(self, main_window_widget, settings):
-        super(AbstractMainWindowView, self).__init__()
 
-        self.main_window_widget = main_window_widget
-        self.settings = settings(settings_id="main")
-
-        # Change closeEvent method to custom
-        self.main_window_widget.closeEvent = types.MethodType(self.quit, self.main_window_widget)
-
-        self.setupUi(self.main_window_widget)
-        self.load_config()
-
-    def register_callback(self, callback_id: str, callback_func: callable):
-        self._callbacks[callback_id] = callback_func
-
-    def get_callback(self, callback_id: str):
-        return self._callbacks[callback_id]
-
-    def remove_callback(self, callback_id: str):
-        ...
-
-    def load_config(self):
-        # Size and position for main window
-        if self.settings.is_maximized:
-            self.main_window_widget.showMaximized()
-        else:
-            w, h = self.settings.window_size
-            x, y = self.settings.window_position
-            if w and h:
-                self.main_window_widget.resize(w, h)
-            if x and y:
-                self.main_window_widget.move(x, y)
-
-    def save_settings(self):
-        # Size and position for main window
-        is_maximized = self.main_window_widget.isMaximized()
-        self.settings.set_maximized(is_maximized)
-        if not is_maximized:
-            self.settings.set_window_size(self.main_window_widget.size().width(),
-                                          self.main_window_widget.size().height())
-
-            self.settings.set_window_position(self.main_window_widget.pos().x(),
-                                              self.main_window_widget.pos().y())
-
+class PyQtierMainWindowView(AbstractView):
     def add_behaviour(self):
         """
         Add callbacks
         :return: None
         """
-        self.actionQuit.triggered.connect(self.quit)
-
-    def quit(self, window, event):
-        """
-        Callback for behaviour when window is closing
-        return: ...
-        """
-        self.save_settings()
-        event.accept()
+        self.ui.actionQuit.triggered.connect(self.quit)
