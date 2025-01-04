@@ -19,12 +19,13 @@ class PyQtierWindowsManager:
     def setup_manager(self):
         ...
 
-    def setup_main_window(self, main_window_view, settings):
+    def setup_main_window(self, ui, main_window_view, settings):
         """
         Setup main
         """
-        self.main_window = main_window_view(self.main_window_widget, settings)
+        self.main_window = main_window_view()
+        self.main_window.setup_view(ui=ui, settings=settings, widget=self.main_window_widget, settings_id="main")
 
     def show_ui(self):
-        self.main_window_widget.show()
+        self.main_window.open()
         sys.exit(self.app.exec_())

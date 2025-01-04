@@ -1,12 +1,7 @@
-from core.views import AbstractMainWindowView
+from core.views import PyQtierMainWindowView
 
 
-class MainWindowView(AbstractMainWindowView):
-
-    def __init__(self, main_window_widget, settings):
-        super(MainWindowView, self).__init__(main_window_widget, settings)
-
+class MainWindowView(PyQtierMainWindowView):
     def add_behaviour(self):
-        super(MainWindowView, self).add_behaviour()
-        self.bt1.clicked.connect(self.get_callback('custom_widget'))
-        self.actionSettings.triggered.connect(self.get_callback('settings_widget'))
+        self.ui.bt1.clicked.connect(self.get_callback('custom_widget'))
+        self.ui.actionSettings.triggered.connect(self.get_callback('settings_widget'))
