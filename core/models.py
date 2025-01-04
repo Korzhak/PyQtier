@@ -5,8 +5,9 @@ from . import auxiliary
 
 
 class PyQtierSettingsModel(object):
+    _config = ConfigParser()
+
     def __init__(self, settings_id: str = "main"):
-        self._config = ConfigParser()
         self._defaults = auxiliary.CONFIG_DEFAULTS
         self._config.read(auxiliary.CONFIG_FILE_PATH)
 
@@ -66,10 +67,15 @@ class PyQtierSettingsModel(object):
         """
         :return: tuple (x, y)
         """
+
         return tuple(map(int, self.__ui.get(
             self.settings_id_for_config + "window_position",
             fallback=self.get_default(self.settings_id_for_config + "window_position", if_none="0,0")
         ).split(",")))
+
+    @property
+    def is_maximized(self) -> bool:
+        return self.__ui.getboolean(self.settings_id_for_config + "is_maximized", fallback=False)
 
     def set_window_size(self, width, height) -> None:
         """
@@ -81,12 +87,22 @@ class PyQtierSettingsModel(object):
         self._config.set("UI", self.settings_id_for_config + "window_size", f"{width}x{height}")
         self.update_config_file()
 
-    def set_window_position(self, x, y) -> None:
+    def set_window_position(self, x: int, y: int) -> None:
         """
         Saving main window position parameters
         :param x: x position of main window (px)
         :param y: y position of main window (px)
+        :param is_maximized: is window showing full screen (True)
         :return: None
         """
         self._config.set("UI", self.settings_id_for_config + "window_position", f"{x},{y}")
+        self.update_config_file()
+
+    def set_maximized(self, is_maximized: bool = False) -> None:
+        """
+        Saving state of main window position parameters
+        :param is_maximized: is window showing full screen (True)
+        :return: None
+        """
+        self._config.set("UI", self.settings_id_for_config + "is_maximized", f"{is_maximized}")
         self.update_config_file()
