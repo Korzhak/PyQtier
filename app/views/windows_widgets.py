@@ -1,7 +1,7 @@
 from app.models.settings import SettingsModel
 from core.registry import PyQtierWidgetRegistry
-from core.templates.custom import Ui_Form
-from core.templates.simple_interface import Ui_SimpleView
+from app.templates import Ui_Form
+from app.templates import Ui_SimpleView
 from core.views import PyQtierSimpleView
 
 

@@ -2,7 +2,7 @@
 from app.models import SettingsModel
 from app.views import MainWindowView
 from core import PyQtierWindowsManager
-from core.templates.main_window_interface import Ui_MainWindow
+from app.templates import Ui_MainWindow
 
 
 class WindowsManager(PyQtierWindowsManager):
