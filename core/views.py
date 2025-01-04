@@ -28,20 +28,29 @@ class AbstractSimpleView:
 
     def load_config(self):
         # Size and position for main window
-        w, h = self.settings.window_size
-        x, y = self.settings.window_position
-        if w and h:
-            self.widget.resize(w, h)
-        if x and y:
-            self.widget.move(x, y)
+        if self.settings.is_maximized:
+            self.widget.showMaximized()
+        else:
+            w, h = self.settings.window_size
+            x, y = self.settings.window_position
+            if w and h:
+                self.widget.resize(w, h)
+            if x and y:
+                self.widget.move(x, y)
 
     def save_settings(self):
-        # Size and position for main window
-        self.settings.set_window_size(self.widget.size().width(),
-                                      self.widget.size().height())
+        """
 
-        self.settings.set_window_position(self.widget.pos().x(),
-                                          self.widget.pos().y())
+        :return:
+        """
+        is_maximized = self.widget.isMaximized()
+        self.settings.set_maximized(is_maximized)
+        if not is_maximized:
+            self.settings.set_window_size(self.widget.size().width(),
+                                          self.widget.size().height())
+
+            self.settings.set_window_position(self.widget.pos().x(),
+                                              self.widget.pos().y())
 
     def add_behaviour(self):
         """
@@ -103,20 +112,26 @@ class AbstractMainWindowView(Ui_MainWindow):
 
     def load_config(self):
         # Size and position for main window
-        w, h = self.settings.window_size
-        x, y = self.settings.window_position
-        if w and h:
-            self.main_window_widget.resize(w, h)
-        if x and y:
-            self.main_window_widget.move(x, y)
+        if self.settings.is_maximized:
+            self.main_window_widget.showMaximized()
+        else:
+            w, h = self.settings.window_size
+            x, y = self.settings.window_position
+            if w and h:
+                self.main_window_widget.resize(w, h)
+            if x and y:
+                self.main_window_widget.move(x, y)
 
     def save_settings(self):
         # Size and position for main window
-        self.settings.set_window_size(self.main_window_widget.size().width(),
-                                      self.main_window_widget.size().height())
+        is_maximized = self.main_window_widget.isMaximized()
+        self.settings.set_maximized(is_maximized)
+        if not is_maximized:
+            self.settings.set_window_size(self.main_window_widget.size().width(),
+                                          self.main_window_widget.size().height())
 
-        self.settings.set_window_position(self.main_window_widget.pos().x(),
-                                          self.main_window_widget.pos().y())
+            self.settings.set_window_position(self.main_window_widget.pos().x(),
+                                              self.main_window_widget.pos().y())
 
     def add_behaviour(self):
         """
