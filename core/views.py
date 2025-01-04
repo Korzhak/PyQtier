@@ -24,7 +24,6 @@ class AbstractView:
         self.widget.closeEvent = types.MethodType(self.quit, self.widget)
         self.settings = settings(self.settings_id)
         self.ui.setupUi(self.widget)
-        self.add_behaviour()
 
     def add_behaviour(self):
         """
@@ -104,6 +103,10 @@ class AbstractView:
 
 
 class PyQtierSimpleView(AbstractView):
+    def setup_view(self, *args, **kwargs):
+        super(PyQtierSimpleView, self).setup_view(*args, **kwargs)
+        self.add_behaviour()
+
     def quit(self, window, event):
         """
         Close the settings window
