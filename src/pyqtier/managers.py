@@ -2,7 +2,7 @@
 import sys
 from PyQt5 import QtWidgets
 
-from core.registry import PyQtierWidgetRegistry
+from .registry import PyQtierWidgetRegistry
 
 
 class PyQtierWindowsManager:
