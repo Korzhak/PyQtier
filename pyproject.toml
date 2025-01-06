@@ -28,3 +28,14 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/Korzhak/PyQtier"
 Issues = "https://github.com/Korzhak/PyQtier/issues"
+
+[project.scripts]
+create-pyqtier = "pyqtier.generator:create_project"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["pyqtier"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
