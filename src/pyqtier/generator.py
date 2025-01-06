@@ -1,15 +1,8 @@
 # generator.py
+import click
 from pathlib import Path
 
-import click
-
 from .generator_templates import TEMPLATES
-
-
-def create_init_file(path):
-    init_path = path / '__init__.py'
-    if not init_path.exists():
-        init_path.touch()
 
 
 @click.command()
@@ -33,7 +26,6 @@ def create_project(project_name):
     for directory in directories:
         dir_path = project_path / directory
         dir_path.mkdir(parents=True, exist_ok=True)
-        create_init_file(dir_path)
 
     # Create files from templates
     for file_path, content in TEMPLATES.items():
@@ -43,11 +35,9 @@ def create_project(project_name):
 
     click.echo(f'Created PyQtier project: {project_name}')
     click.echo('Project structure created successfully!')
-    click.echo('\nTo get started:')
-    click.echo(f'  cd {project_name}')
-    click.echo(f'  If you didn\'t install PyQtier, try to use follow command:')
-    click.echo(
-        f'    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pyqtier')
+    if project_name != '.':
+        click.echo('\nTo get started:')
+        click.echo(f'  cd {project_name}')
 
 
 if __name__ == '__main__':
