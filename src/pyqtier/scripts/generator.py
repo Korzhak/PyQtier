@@ -1,12 +1,11 @@
 # generator.py
-import click
 from pathlib import Path
+
+import click
 
 from .generator_templates import TEMPLATES
 
 
-@click.command()
-@click.argument('project_name')
 def create_project(project_name):
     """Generate a new PyQtier project structure"""
     project_path = Path(project_name)
@@ -38,7 +37,3 @@ def create_project(project_name):
     if project_name != '.':
         click.echo('\nTo get started:')
         click.echo(f'  cd {project_name}')
-
-
-if __name__ == '__main__':
-    create_project()
