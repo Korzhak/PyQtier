@@ -30,11 +30,11 @@ Homepage = "https://github.com/Korzhak/PyQtier"
 Issues = "https://github.com/Korzhak/PyQtier/issues"
 
 [project.scripts]
-create-pyqtier = "pyqtier.generator:create_project"
+pyqtier = "pyqtier.scripts.cli:cli"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-packages = ["pyqtier"]
+packages = ["pyqtier", "pyqtier.scripts"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
