@@ -1,10 +1,13 @@
 import subprocess
 import sys
 from pathlib import Path
+import os
 
 
-def converter(base_dir, ui_path):
-    templates_dir = base_dir / 'app' / 'templates'
+def converter(ui_path):
+    # Get current working directory instead of package directory
+    current_dir = Path.cwd()
+    templates_dir = current_dir / 'app' / 'templates'
     output_file = str(templates_dir / ui_path.stem) + '.py'
     try:
         subprocess.run(['pyuic5', str(ui_path), '-o', output_file], check=True)
@@ -21,9 +24,9 @@ def convert_ui_to_py(ui_file=None):
         ui_file (str, optional): Specific .ui file to convert.
                                 If None, converts all .ui files.
     """
-    # Define base paths
-    base_dir = Path(__file__).parent
-    ui_dir = base_dir / 'app' / 'templates' / 'ui'
+    # Get current working directory
+    current_dir = Path.cwd()
+    ui_dir = current_dir / 'app' / 'templates' / 'ui'
 
     if ui_file:
         # Convert specific file
@@ -36,7 +39,7 @@ def convert_ui_to_py(ui_file=None):
             print("Error: File must have .ui extension")
             return
 
-        converter(base_dir, ui_path)
+        converter(ui_path)
 
     else:
         # Convert all .ui files
@@ -46,11 +49,4 @@ def convert_ui_to_py(ui_file=None):
             return
 
         for ui_path in ui_files:
-            converter(base_dir, ui_path)
-
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        convert_ui_to_py(sys.argv[1])
-    else:
-        convert_ui_to_py()
+            converter(ui_path)
