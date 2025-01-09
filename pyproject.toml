@@ -1,6 +1,6 @@
 [project]
 name = "PyQtier"
-version = "0.0.7"
+version = "0.0.8"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
 ]
@@ -34,7 +34,12 @@ pyqtier = "pyqtier.scripts.cli:cli"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-packages = ["pyqtier", "pyqtier.scripts"]
+packages = [
+    "pyqtier",
+    "pyqtier.scripts",
+    "pyqtier.widgets",
+    "pyqtier.plugins"
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]
