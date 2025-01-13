@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import types
-
 from PyQt5 import QtWidgets
 
 
-class AbstractView:
+class AbstractPresenter:
     _callbacks = {}
 
     def __init__(self):
@@ -102,9 +99,9 @@ class AbstractView:
         return self.__is_opened
 
 
-class PyQtierSimpleView(AbstractView):
+class PyQtierSimplePresenter(AbstractPresenter):
     def setup_view(self, *args, **kwargs):
-        super(PyQtierSimpleView, self).setup_view(*args, **kwargs)
+        super(PyQtierSimplePresenter, self).setup_view(*args, **kwargs)
         self.add_behaviour()
 
     def quit(self, window, event):
@@ -118,7 +115,7 @@ class PyQtierSimpleView(AbstractView):
         event.accept()
 
 
-class PyQtierMainWindowView(AbstractView):
+class PyQtierMainWindowPresenter(AbstractPresenter):
     def add_behaviour(self):
         """
         Add callbacks
