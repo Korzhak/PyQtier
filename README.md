@@ -53,4 +53,8 @@ where `<project_path_and_name>` can be just `.` if you want to create project in
 python main.py
 ```
 
+## Detailed docs
+
+1. [Plugins](docs/PLUGINS.md)
+
 
