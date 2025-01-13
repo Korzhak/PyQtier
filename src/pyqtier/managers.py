@@ -2,7 +2,7 @@
 import sys
 from PyQt5 import QtWidgets
 
-from .registry import PyQtierWidgetRegistry
+from .registry import PyQtierWindowsRegistry
 
 
 class PyQtierWindowsManager:
@@ -11,7 +11,7 @@ class PyQtierWindowsManager:
         self.main_window_widget = QtWidgets.QMainWindow()
         self.main_window = None
 
-        self.widget_registry = PyQtierWidgetRegistry()
+        self.widget_registry = PyQtierWindowsRegistry()
         self.widget_registry.create_registered_widgets()
 
         self.setup_manager()

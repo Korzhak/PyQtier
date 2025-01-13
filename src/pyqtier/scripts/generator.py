@@ -6,8 +6,12 @@ import click
 from .generator_templates import TEMPLATES
 
 
-def create_project(project_name):
-    """Generate a new PyQtier project structure"""
+def create_project(project_name: str):
+    """
+    Generate a new PyQtier project structure
+    Args:
+        project_name: name of the folder where the project will be created
+    """
     project_path = Path(project_name)
 
     # Create main project directory
@@ -17,9 +21,9 @@ def create_project(project_name):
     directories = [
         'app',
         'app/models',
-        'app/templates',
-        'app/templates/ui',
-        'app/views'
+        'app/views',
+        'app/views/templates',
+        'app/presenters'
     ]
 
     for directory in directories:
