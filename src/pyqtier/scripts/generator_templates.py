@@ -20,12 +20,11 @@ if __name__ == '__main__':
     main()
 ''',
 
-    'app/windows_manager.py': '''# -*- coding: utf-8 -*-
-from pyqtier import PyQtierWindowsManager
+    'app/windows_manager.py': '''from pyqtier import PyQtierWindowsManager
 
 from app.models import SettingsModel
-from app.templates import Ui_MainWindow
-from app.views import MainWindowView
+from app.views import Ui_MainWindow
+from app.presenters import MainWindowPresenter
 
 
 class WindowsManager(PyQtierWindowsManager):
@@ -34,7 +33,7 @@ class WindowsManager(PyQtierWindowsManager):
         self.settings_window = None
 
     def setup_manager(self):
-        self.setup_main_window(Ui_MainWindow, MainWindowView, SettingsModel)
+        self.setup_main_window(Ui_MainWindow, MainWindowPresenter, SettingsModel)
 
         # Creating windows widgets
         self.settings_window = self.widget_registry.get_initialized_widget('settings_widget')
@@ -43,8 +42,6 @@ class WindowsManager(PyQtierWindowsManager):
 
         # Adding behaviours to widgets (must be the last section)
         self.main_window.add_behaviour()
-
-
     ''',
 
     'app/models/__init__.py': '''from .settings import SettingsModel''',
@@ -57,35 +54,34 @@ class SettingsModel(PyQtierSettingsModel):
         super(SettingsModel, self).__init__(settings_id)
 ''',
 
-    'app/views/__init__.py': '''
-from .windows_widgets import *
-from .main_window_view import MainWindowView
+    'app/presenters/__init__.py': '''from .main_window_presenter import MainWindowPresenter
+from .other_presenters import *
     ''',
 
-    'app/views/main_window_view.py': '''from pyqtier.views import PyQtierMainWindowView
+    'app/presenters/main_window_presenter.py': '''from pyqtier.presenters import PyQtierMainWindowPresenter
 
 
-class MainWindowView(PyQtierMainWindowView):
+class MainWindowPresenter(PyQtierMainWindowPresenter):
     def add_behaviour(self):
         self.ui.actionSettings.triggered.connect(self.get_callback('settings_widget'))
 ''',
 
-    'app/views/windows_widgets.py': '''from app.models.settings import SettingsModel
-from pyqtier.registry import PyQtierWidgetRegistry
-from app.templates import Ui_SimpleView
-from pyqtier.views import PyQtierSimpleView
+    'app/presenters/other_presenters.py': '''from app.models.settings import SettingsModel
+from app.views import Ui_SimpleView
+from pyqtier.registry import PyQtierWindowsRegistry
+from pyqtier.presenters import PyQtierSimplePresenter
 
 
-@PyQtierWidgetRegistry.register("settings_widget", Ui_SimpleView, SettingsModel)
-class SettingsWidget(PyQtierSimpleView):
+@PyQtierWindowsRegistry.register("settings_widget", Ui_SimpleView, SettingsModel)
+class SettingsWidget(PyQtierSimplePresenter):
     ...
 ''',
 
-    'app/templates/__init__.py': '''from .main_window_interface import Ui_MainWindow
+    'app/views/__init__.py': '''from .main_window_interface import Ui_MainWindow
 from .simple_interface import Ui_SimpleView
     ''',
 
-    'app/templates/simple_interface.py': '''# -*- coding: utf-8 -*-
+    'app/views/simple_interface.py': '''# -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -113,7 +109,7 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 ''',
 
-    'app/templates/main_window_interface.py': '''# -*- coding: utf-8 -*-
+    'app/views/main_window_interface.py': '''# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'testProject/app/templates/ui/main_window_interface.ui'
 #
@@ -163,7 +159,7 @@ class Ui_MainWindow(object):
         self.actionQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
 ''',
 
-    'app/templates/ui/main_window_interface.ui': '''<?xml version="1.0" encoding="UTF-8"?>
+    'app/views/templates/main_window_interface.ui': '''<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -217,8 +213,8 @@ class Ui_MainWindow(object):
  <connections/>
 </ui>
 ''',
-    
-    'app/templates/ui/simple_interface.ui': '''<?xml version="1.0" encoding="UTF-8"?>
+
+    'app/views/templates/simple_interface.ui': '''<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SimpleView</class>
  <widget class="QWidget" name="SimpleView">

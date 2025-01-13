@@ -1,6 +1,6 @@
 [project]
 name = "PyQtier"
-version = "0.0.8"
+version = "0.1.0"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
 ]
@@ -39,7 +39,10 @@ packages = [
     "pyqtier",
     "pyqtier.scripts",
     "pyqtier.widgets",
-    "pyqtier.plugins"
+    "pyqtier.plugins",
+    "pyqtier.plugins.usb_plugin",
+    "pyqtier.plugins.usb_plugin.models",
+    "pyqtier.plugins.usb_plugin.views",
 ]
 
 [build-system]

@@ -1,7 +1,7 @@
 from typing import Callable, Any
 
 
-class PyQtierWidgetRegistry:
+class PyQtierWindowsRegistry:
     _widgets = {}
     _templates = {}
     _settings = {}
