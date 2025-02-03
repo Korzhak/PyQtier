@@ -4,7 +4,7 @@ import serial
 from PyQt5.QtCore import QThread, pyqtSignal
 from serial.tools import list_ports
 
-from .data_parser import UsbDataParser
+from .data_parser import UsbDataParser, UsbDataSerializer
 from .statuses import *
 
 
@@ -21,6 +21,7 @@ class SerialModel(QThread):
         self._is_serial_connected = False
         self._com_connection_lost_callback = None
         self._data_parser: Optional[UsbDataParser] = None
+        self._data_serializer: Optional[UsbDataSerializer] = None
 
     def set_connection_type(self, is_connection_via_usb: bool):
         self._is_connection_via_usb = is_connection_via_usb
@@ -59,7 +60,13 @@ class SerialModel(QThread):
         if isinstance(data_parser, UsbDataParser):
             self._data_parser = data_parser
         else:
-            raise TypeError("Argument must be a DataParser object")
+            raise TypeError("Argument must be a UsbDataParser object")
+
+    def set_data_serializer(self, data_serializer: UsbDataSerializer):
+        if isinstance(data_parser, UsbDataSerializer):
+            self._data_serializer = data_serializer
+        else:
+            raise TypeError("Argument must be a UsbDataSerializer object")
 
     def set_after_parsing_callback(self, callback: Callable):
         self._data_parser.set_callback_after_parsing(callback)
@@ -111,8 +118,8 @@ class SerialModel(QThread):
         """
         if self._is_serial_connected:
             try:
-                if self._data_parser is not None:
-                    serialized_data = self._data_parser.serialize(data)
+                if self._data_serializer is not None:
+                    serialized_data = self._data_serializer.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
                     return 0
