@@ -63,7 +63,7 @@ class SerialModel(QThread):
             raise TypeError("Argument must be a UsbDataParser object")
 
     def set_data_serializer(self, data_serializer: UsbDataSerializer):
-        if isinstance(data_parser, UsbDataSerializer):
+        if isinstance(data_serializer, UsbDataSerializer):
             self._data_serializer = data_serializer
         else:
             raise TypeError("Argument must be a UsbDataSerializer object")
