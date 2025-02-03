@@ -77,6 +77,10 @@ class PyQtierSettingsModel(object):
     def is_maximized(self) -> bool:
         return self.__ui.getboolean(self.settings_id_for_config + "is_maximized", fallback=False)
 
+    @property
+    def is_full_screen(self) -> bool:
+        return self.__ui.getboolean(self.settings_id_for_config + "is_full_screen", fallback=False)
+
     def set_window_size(self, width, height) -> None:
         """
         Saving main window size parameters
@@ -105,4 +109,13 @@ class PyQtierSettingsModel(object):
         :return: None
         """
         self._config.set("UI", self.settings_id_for_config + "is_maximized", f"{is_maximized}")
+        self.update_config_file()
+
+    def set_full_screen(self, is_full_screen: bool = False) -> None:
+        """
+        Saving state of main window position parameters
+        :param is_maximized: is window showing full screen (True)
+        :return: None
+        """
+        self._config.set("UI", self.settings_id_for_config + "is_full_screen", f"{is_full_screen}")
         self.update_config_file()
