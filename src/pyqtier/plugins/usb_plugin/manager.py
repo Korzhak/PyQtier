@@ -43,6 +43,9 @@ class UsbPluginManager(PyQtierPlugin):
 
         self.add_behaviours()
 
+    def set_serializer(self, serializer: callable):
+        self._serial.set_data_serializer(serializer)
+
     def set_obtain_data_callback(self, callback: Callable):
         """
         Function which obtain data after obtaining and parsing
