@@ -1,6 +1,8 @@
 import time
 from typing import Callable, Any
 
+from PyQt5 import QtGui, QtCore
+
 from .auxiliary import *
 from .models.data_parser import UsbDataParser
 from .models.serial_model import SerialModel, STATUS_OK
@@ -89,8 +91,12 @@ class UsbPluginManager(PyQtierPlugin):
 
             self._serial.disconnect()
 
-            # self.bt_com.setIcon(self.__icon_com_connect)
-            self._ui.bt_connect_disconnect.setText("Connect")
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(":/buttons_img/img/connect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self._ui.bt_connect_disconnect.setIcon(icon)
+            self._ui.bt_connect_disconnect.setIconSize(QtCore.QSize(27, 27))
+
+            # self._ui.bt_connect_disconnect.setText("Connect")
 
             if self._statusbar:
                 self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} disconnected!", 4000)
@@ -104,7 +110,11 @@ class UsbPluginManager(PyQtierPlugin):
             # Checking if connecting successfully
             if self._serial.connect() == STATUS_OK:
                 # self.bt_com.setIcon(self.__icon_com_disconnect)
-                self._ui.bt_connect_disconnect.setText("Disconnect")
+                # self._ui.bt_connect_disconnect.setText("Disconnect")
+                icon = QtGui.QIcon()
+                icon.addPixmap(QtGui.QPixmap(":/buttons_img/img/disconnect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self._ui.bt_connect_disconnect.setIcon(icon)
+                self._ui.bt_connect_disconnect.setIconSize(QtCore.QSize(27, 27))
                 if self._statusbar:
                     self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} connected!", 4000)
                 self._start_send_data_callback()
