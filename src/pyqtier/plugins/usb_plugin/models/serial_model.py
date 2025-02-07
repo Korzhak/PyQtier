@@ -147,3 +147,6 @@ class SerialModel(QThread):
         :return: List of available serial ports
         """
         return [str(i) for i in list_ports.comports()] if item_as_str else list_ports.comports()
+
+    def get_current_serial_port(self):
+        return self._serial_port
