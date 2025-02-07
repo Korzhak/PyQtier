@@ -30,7 +30,7 @@ class UsbPortMonitor:
 
         # Перевірка відключених пристроїв
         disconnected = self.connected_ports - current_ports
-        if disconnected and self.manager.is_connected:
+        if disconnected and self.manager.is_connected():
             if self.manager.get_current_serial_port() in disconnected:
                 self.manager.disconnect()
                 self.manager.obtain_error_callback("Пристрій було відключено")
@@ -69,6 +69,7 @@ class UsbPluginManager(PyQtierPlugin):
 
         self._callback_loose_connection: Optional[callable] = callback_loose_connection
 
+        self._is_obtain_data_callback_set = False
         # TODO: realize themes for plugin
         self.theme_settings: dict[str: Any[str, bool]] = THEME_SETTINGS
 
@@ -79,7 +80,6 @@ class UsbPluginManager(PyQtierPlugin):
         if self._serial.is_connected:
             self._connect_disconnect_callback()
 
-    @property
     def is_connected(self):
         return self._serial.is_connected
 
@@ -109,19 +109,26 @@ class UsbPluginManager(PyQtierPlugin):
     def set_data_serializer(self, serializer: callable):
         self._serial.set_data_serializer(serializer)
 
-    def set_obtain_data_callback(self, callback: Callable):
+    def set_after_parsing_data_callback(self, callback):
+        if callable(callback):
+            self._serial.set_after_parsing_callback(callback)
+            if not self._is_obtain_data_callback_set:
+                self.set_obtain_data_callback()
+                self._is_obtain_data_callback_set = True
+
+    def set_obtain_data_callback(self):
         """
         Function which obtain data after obtaining and parsing
         :param callback: function
         :return: None
         """
-        if callable(callback):
-            self._serial.set_after_parsing_callback(callback)
-            self._obtain_data_callback = self._serial.get_parse_callback()
+        # if callable(callback):
+        # self._serial.set_after_parsing_callback(callback)
+        self._obtain_data_callback = self._serial.get_parse_callback()
 
-            self._serial.data_received.connect(self._obtain_data_callback)
-        else:
-            raise TypeError("Callback must be callable")
+        self._serial.data_received.connect(self._obtain_data_callback)
+        # else:
+        #     raise TypeError("Callback must be callable")
 
     def set_obtain_error_callback(self, callback: Callable):
         if callable(callback):
@@ -197,7 +204,9 @@ class UsbPluginManager(PyQtierPlugin):
         if current_device in available_devices:
             self._ui.cb_list_usb_devices.setCurrentIndex(available_devices.index(current_device))
 
-    def send(self, data: str) -> int:
+    def send(self, data: str, callback=None) -> int:
+        if callback:
+            self.set_after_parsing_data_callback(callback)
         return self._serial.write(data)
 
     @staticmethod
