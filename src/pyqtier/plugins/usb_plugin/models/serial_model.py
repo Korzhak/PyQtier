@@ -22,6 +22,7 @@ class SerialModel(QThread):
         self._com_connection_lost_callback = None
         self._data_parser: Optional[UsbDataParser] = None
         self._data_serializer: Optional[UsbDataSerializer] = None
+        self._error_callback: callable = None
 
     def set_connection_type(self, is_connection_via_usb: bool):
         self._is_connection_via_usb = is_connection_via_usb
@@ -57,16 +58,15 @@ class SerialModel(QThread):
         return STATUS_ERROR
 
     def set_data_parser(self, data_parser: UsbDataParser):
-        if isinstance(data_parser, UsbDataParser):
-            self._data_parser = data_parser
-        else:
-            raise TypeError("Argument must be a UsbDataParser object")
+        self._data_parser = data_parser
+        self.data_received.connect(self.get_parse_callback())
+
+    def set_error_callback(self, callback: Callable):
+        self._error_callback = callback
+        self.error_occurred.connect(self._error_callback)
 
     def set_data_serializer(self, data_serializer: UsbDataSerializer):
-        if isinstance(data_serializer, UsbDataSerializer):
-            self._data_serializer = data_serializer
-        else:
-            raise TypeError("Argument must be a UsbDataSerializer object")
+        self._data_serializer = data_serializer
 
     def set_after_parsing_callback(self, callback: Callable):
         self._data_parser.set_callback_after_parsing(callback)

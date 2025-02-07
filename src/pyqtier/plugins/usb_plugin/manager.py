@@ -69,7 +69,6 @@ class UsbPluginManager(PyQtierPlugin):
 
         self._callback_loose_connection: Optional[callable] = callback_loose_connection
 
-        self._is_obtain_data_callback_set = False
         # TODO: realize themes for plugin
         self.theme_settings: dict[str: Any[str, bool]] = THEME_SETTINGS
 
@@ -110,32 +109,10 @@ class UsbPluginManager(PyQtierPlugin):
         self._serial.set_data_serializer(serializer)
 
     def set_after_parsing_data_callback(self, callback):
-        if callable(callback):
-            self._serial.set_after_parsing_callback(callback)
-            if not self._is_obtain_data_callback_set:
-                self.set_obtain_data_callback()
-                self._is_obtain_data_callback_set = True
-
-    def set_obtain_data_callback(self):
-        """
-        Function which obtain data after obtaining and parsing
-        :param callback: function
-        :return: None
-        """
-        # if callable(callback):
-        # self._serial.set_after_parsing_callback(callback)
-        self._obtain_data_callback = self._serial.get_parse_callback()
-
-        self._serial.data_received.connect(self._obtain_data_callback)
-        # else:
-        #     raise TypeError("Callback must be callable")
+        self._serial.set_after_parsing_callback(callback)
 
     def set_obtain_error_callback(self, callback: Callable):
-        if callable(callback):
-            self._obtain_error_callback = callback
-            self._serial.error_occurred.connect(self._obtain_error_callback)
-        else:
-            raise TypeError("Callback must be callable")
+        self._serial.set_error_callback(callback)
 
     def set_data_parser(self, data_parser: UsbDataParser):
         """
