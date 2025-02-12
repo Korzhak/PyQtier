@@ -11,7 +11,7 @@ def converter(ui_path: Path) -> None:
     """
     # Get current working directory instead of package directory
     current_dir = Path.cwd()
-    templates_dir = current_dir / 'app' / 'views'
+    templates_dir = current_dir / 'app' / 'templates'
     output_file = str(templates_dir / ui_path.stem) + '.py'
     try:
         subprocess.run(['pyuic5', str(ui_path), '-o', output_file], check=True)
@@ -30,7 +30,7 @@ def convert_ui_to_py(ui_file: Optional[str] = None):
     """
     # Get current working directory
     current_dir = Path.cwd()
-    ui_dir = current_dir / 'app' / 'views' / 'templates'
+    ui_dir = current_dir / 'app' / 'templates' / 'ui'
 
     if ui_file:
         # Convert specific file

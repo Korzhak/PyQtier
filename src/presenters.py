@@ -45,9 +45,8 @@ class AbstractPresenter:
         """
         if not self.settings:
             raise Exception("Settings not loaded")
-        if self.settings.is_full_screen:
-            self.widget.showFullScreen()
-        elif self.settings.is_maximized:
+
+        if self.settings.is_maximized:
             self.widget.showMaximized()
         else:
             w, h = self.settings.window_size
@@ -65,11 +64,9 @@ class AbstractPresenter:
         if not self.settings:
             raise Exception("Settings not loaded")
 
-        is_full_screen = self.widget.isFullScreen()
         is_maximized = self.widget.isMaximized()
-        self.settings.set_full_screen(is_full_screen)
         self.settings.set_maximized(is_maximized)
-        if not is_maximized and not is_full_screen:
+        if not is_maximized:
             self.settings.set_window_size(self.widget.size().width(),
                                           self.widget.size().height())
 
@@ -124,4 +121,4 @@ class PyQtierMainWindowPresenter(AbstractPresenter):
         Add callbacks
         :return: None
         """
-        self.ui.actionQuit.triggered.connect(self.quit)
+        self.ui.actionQuit.triggered.connect(self.widget.close)
