@@ -44,7 +44,8 @@ class UsbDataParser(object):
         :param data: raw data
         :return: result of callback
         """
-        return self._callback_after_parsing(self.parse(data))
+        for decoded_data in data.decode().split("\r\n"):
+            self._callback_after_parsing(self.parse(decoded_data))
 
     @staticmethod
     def calculate_crc(data: bytes) -> int:
