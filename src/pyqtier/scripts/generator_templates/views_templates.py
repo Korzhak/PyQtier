@@ -1,3 +1,9 @@
+INIT_VIEWS = '''from .main_window_interface import Ui_MainWindow
+from .simple_interface import Ui_SimpleView
+from .about_window_interface import Ui_AboutView
+
+'''
+
 ABOUT_WINDOW_INTERFACE = '''# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file '.\app\views\templates\about_wingow_interface.ui'
