@@ -1,1 +1,3 @@
-from .extended_combobox_widget import ExtendedComboBox
+from .pqr_widgets import PyQtierWidgetBase, PyQtierMainWindow
+
+__all__ = ['PyQtierMainWindow', 'PyQtierWidgetBase']
