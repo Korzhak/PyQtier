@@ -15,6 +15,8 @@ VIEWS_DIR = APP_DIR / 'views'
 # Placing of .ui files which created by Qt Designer
 UI_DIR = VIEWS_DIR / 'templates'
 
+IMG_DIR = UI_DIR / 'img'
+
 # Placing of .qrc files and images
 RESOURCES_DIR = UI_DIR
 

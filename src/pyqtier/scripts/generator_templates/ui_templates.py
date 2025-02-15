@@ -13,6 +13,10 @@ ABOUT_WINDOW_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
   <property name="windowTitle">
    <string>About</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/img/information.png</normaloff>:/icons/img/information.png</iconset>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="lb_app_logo">
@@ -26,7 +30,7 @@ ABOUT_WINDOW_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../pyqtier/statics/resources.qrc">:/logo/img/framework_logo.png</pixmap>
+      <pixmap resource="resources.qrc">:/icons/img/snake_logo.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -76,6 +80,7 @@ ABOUT_WINDOW_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
   </layout>
  </widget>
  <resources>
+  <include location="resources.qrc"/>
   <include location="../../../pyqtier/statics/resources.qrc"/>
  </resources>
  <connections/>
@@ -96,6 +101,10 @@ MAIN_WINDOW_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
   </property>
   <property name="windowTitle">
    <string>PyQtier Main Window</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/img/snake.png</normaloff>:/icons/img/snake.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
@@ -144,7 +153,9 @@ MAIN_WINDOW_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
 '''
@@ -164,7 +175,14 @@ SIMPLE_INTERFACE_UI = '''<?xml version="1.0" encoding="UTF-8"?>
   <property name="windowTitle">
    <string>SimpleView</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/img/settings.png</normaloff>:/icons/img/settings.png</iconset>
+  </property>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
-</ui>'''
+</ui>
+'''

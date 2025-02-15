@@ -50,7 +50,6 @@ class PyQtierMainWindow(PyQtierBase, QMainWindow):
         QMainWindow.__init__(self)
         PyQtierBase.__init__(self, view_class, config)
         self.setWindowTitle(config.APP_NAME)
-        self.setWindowIcon(QIcon(":/logo/img/framework_logo.png"))
         self.create_behavior()
 
     def _save_additional_state(self):

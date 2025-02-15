@@ -6,7 +6,7 @@ from .about_window_interface import Ui_AboutView
 
 ABOUT_WINDOW_INTERFACE = '''# -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\app\views\templates\about_wingow_interface.ui'
+# Form implementation generated from reading ui file 'D:\Projects\Python\PyQtierTest\app\views\templates\about_window_interface.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -21,12 +21,15 @@ class Ui_AboutView(object):
     def setupUi(self, AboutView):
         AboutView.setObjectName("AboutView")
         AboutView.resize(281, 246)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/img/information.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        AboutView.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(AboutView)
         self.gridLayout.setObjectName("gridLayout")
         self.lb_app_logo = QtWidgets.QLabel(AboutView)
         self.lb_app_logo.setMaximumSize(QtCore.QSize(150, 150))
         self.lb_app_logo.setText("")
-        self.lb_app_logo.setPixmap(QtGui.QPixmap(":/logo/img/framework_logo.png"))
+        self.lb_app_logo.setPixmap(QtGui.QPixmap(":/icons/img/snake_logo.png"))
         self.lb_app_logo.setScaledContents(True)
         self.lb_app_logo.setObjectName("lb_app_logo")
         self.gridLayout.addWidget(self.lb_app_logo, 0, 0, 1, 1)
@@ -58,12 +61,13 @@ class Ui_AboutView(object):
         self.lb_app_name.setText(_translate("AboutView", "App Name"))
         self.lb_app_version.setText(_translate("AboutView", "Version"))
         self.lb_company_name.setText(_translate("AboutView", "Company Name"))
+from app.views import resources_rc
 
 '''
 
 MAIN_WINDOW_INTERFACE = '''# -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\app\views\templates\main_window_interface.ui'
+# Form implementation generated from reading ui file 'D:\Projects\Python\PyQtierTest\app\views\templates\main_window_interface.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -78,6 +82,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(823, 649)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/img/snake.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -117,12 +124,13 @@ class Ui_MainWindow(object):
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
         self.actionQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
+from app.views import resources_rc
 
 '''
 
 SIMPLE_WINDOW_INTERFACE = '''# -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\app\views\templates\simple_interface.ui'
+# Form implementation generated from reading ui file 'D:\Projects\Python\PyQtierTest\app\views\templates\simple_interface.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -137,6 +145,9 @@ class Ui_SimpleView(object):
     def setupUi(self, SimpleView):
         SimpleView.setObjectName("SimpleView")
         SimpleView.resize(400, 300)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/img/settings.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        SimpleView.setWindowIcon(icon)
 
         self.retranslateUi(SimpleView)
         QtCore.QMetaObject.connectSlotsByName(SimpleView)
@@ -144,5 +155,6 @@ class Ui_SimpleView(object):
     def retranslateUi(self, SimpleView):
         _translate = QtCore.QCoreApplication.translate
         SimpleView.setWindowTitle(_translate("SimpleView", "SimpleView"))
+from app.views import resources_rc
 
 '''
