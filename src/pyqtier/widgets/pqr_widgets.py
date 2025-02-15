@@ -5,8 +5,8 @@ from PyQt5.QtGui import QIcon
 
 class PyQtierBase:
     def __init__(self, view_class, configs):
-        self._view = view_class()
-        self._view.setupUi(self)
+        self.view = view_class()
+        self.view.setupUi(self)
         self.settings = QSettings(configs.COMPANY_SHORT_NAME, configs.APP_SHORT_NAME)
         self.settings.beginGroup(self.__class__.__name__)
         self.configs = configs
