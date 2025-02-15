@@ -26,15 +26,13 @@ def designer():
 
 @cli.command()
 @click.argument('project_name')
-@click.argument('project_path', required=False)
-def startproject(project_name, project_path):
+def startproject(project_name):
     """
     Creating a project with (pyqtier|pqr) command
-    :param project_path: Write a '.' for creating project in current directory
-    :param project_name: Name of project (automatically adding to config)
+    :param project_name: Name of project (simultaneously path to project). Left '.' for creating project in current directory
     :return: None
     """
-    create_project(project_name, project_path)
+    create_project(project_name)
 
 
 @cli.command()

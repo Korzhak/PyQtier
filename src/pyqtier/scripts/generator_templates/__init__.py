@@ -2,8 +2,9 @@ from .main_templates import MAIN
 from .manager_templates import MANAGER
 from .config_templates import CONFIG
 from .widget_templates import MAIN_WINDOW, ABOUT_WINDOW, SETTINGS_WINDOW, INIT
-from .views_templates import ABOUT_WINDOW_INTERFACE, MAIN_WINDOW_INTERFACE, SIMPLE_WINDOW_INTERFACE, INIT_VIEWS
+from .views_templates import INIT_VIEWS
 from .ui_templates import ABOUT_WINDOW_INTERFACE_UI, MAIN_WINDOW_INTERFACE_UI, SIMPLE_INTERFACE_UI
+from .resources_templates import RESOURCES_QRC
 from ..config import *
 
 # Creating relative imports
@@ -24,11 +25,9 @@ TEMPLATES = {
     str(widgets_dir / "settings_window.py"): SETTINGS_WINDOW,
 
     str(views_dir / "__init__.py"): INIT_VIEWS,
-    str(views_dir / "about_window_interface.py"): ABOUT_WINDOW_INTERFACE,
-    str(views_dir / "main_window_interface.py"): MAIN_WINDOW_INTERFACE,
-    str(views_dir / "simple_interface.py"): SIMPLE_WINDOW_INTERFACE,
 
     str(ui_dir / "about_window_interface.ui"): ABOUT_WINDOW_INTERFACE_UI,
     str(ui_dir / "main_window_interface.ui"): MAIN_WINDOW_INTERFACE_UI,
     str(ui_dir / "simple_interface.ui"): SIMPLE_INTERFACE_UI,
+    str(ui_dir / "resources.qrc"): RESOURCES_QRC,
 }
