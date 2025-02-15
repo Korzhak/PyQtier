@@ -1,11 +1,17 @@
 # PyQtier
 
-PyQtier is a command-line tool and architecture solution that helps you work with PyQt5 projects siplier and faster,
+PyQtier is a command-line tool and architecture solution that helps you work with PyQt5 projects simpler and faster,
 providing convenient commands for project creation, UI file conversion, and Qt Designer integration.
 
 ![screenshot_1.png](docs/img/screenshot_1.png)
 
-Also, it provides you with classes which has implemented work with QSettings.
+## Features
+
+- Command-line interface for project management
+- Built-in GUI application with modern interface
+- Qt Designer integration
+- Automatic UI and resource file conversion
+- Project scaffolding and architecture solutions
 
 ## Installation
 
