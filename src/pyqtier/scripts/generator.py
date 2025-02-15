@@ -1,32 +1,25 @@
-# generator.py
 from pathlib import Path
 
 import click
 
 from .generator_templates import TEMPLATES
+from .config import *
 
 
-def create_project(project_name: str):
+def create_project(project_name: str, project_path: str = '.'):
     """
     Generate a new PyQtier project structure
     Args:
-        project_name: name of the folder where the project will be created
+        :param project_name: name of the folder where the project will be created
+        :param project_path:
     """
     project_path = Path(project_name)
 
     # Create main project directory
     project_path.mkdir(exist_ok=True)
 
-    # Create directory structure
-    directories = [
-        'app',
-        'app/models',
-        'app/views',
-        'app/views/templates',
-        'app/presenters'
-    ]
-
-    for directory in directories:
+    # Create directories structure
+    for directory in DIRS_OF_PROJECT:
         dir_path = project_path / directory
         dir_path.mkdir(parents=True, exist_ok=True)
 
