@@ -23,6 +23,7 @@ def converter(ui_path: Path) -> None:
     try:
         subprocess.run([
             'pyuic5',
+            str(ui_path),
             '--import-from',
             get_python_relative_path(VIEWS_DIR),
             '-o',

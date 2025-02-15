@@ -2,7 +2,7 @@ from .main_templates import MAIN
 from .manager_templates import MANAGER
 from .config_templates import CONFIG
 from .widget_templates import MAIN_WINDOW, ABOUT_WINDOW, SETTINGS_WINDOW, INIT
-from .views_templates import ABOUT_WINDOW_INTERFACE, MAIN_WINDOW_INTERFACE, SIMPLE_WINDOW_INTERFACE
+from .views_templates import ABOUT_WINDOW_INTERFACE, MAIN_WINDOW_INTERFACE, SIMPLE_WINDOW_INTERFACE, INIT_VIEWS
 from .ui_templates import ABOUT_WINDOW_INTERFACE_UI, MAIN_WINDOW_INTERFACE_UI, SIMPLE_INTERFACE_UI
 from ..config import *
 
@@ -23,6 +23,7 @@ TEMPLATES = {
     str(widgets_dir / "main_window.py"): MAIN_WINDOW,
     str(widgets_dir / "settings_window.py"): SETTINGS_WINDOW,
 
+    str(views_dir / "__init__.py"): INIT_VIEWS,
     str(views_dir / "about_window_interface.py"): ABOUT_WINDOW_INTERFACE,
     str(views_dir / "main_window_interface.py"): MAIN_WINDOW_INTERFACE,
     str(views_dir / "simple_interface.py"): SIMPLE_WINDOW_INTERFACE,

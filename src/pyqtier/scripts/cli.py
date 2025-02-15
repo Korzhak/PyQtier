@@ -39,15 +39,15 @@ def startproject(project_name, project_path):
 
 @cli.command()
 @click.argument('filename', required=False)
-@click.argument('qrc', required=False)
-def convertui(filename, auto_convert_qrc):
+@click.option('--autorc', is_flag=True, default=False, help="Auto convert .qrc files after converting .ui files")
+def convertui(filename, autorc):
     """
     Auto converting .ui files to .py
     :param filename: [optional] name of file to convert. Converting all of .ui if it didn't pass
-    :param auto_convert_qrc: [optional] auto converting .qrc files after converting .ui files
+    :param autorc: [optional] auto converting .qrc files after converting .ui files
     :return: None
     """
-    convert_ui_to_py(filename, auto_convert_qrc)
+    convert_ui_to_py(filename, autorc)
 
 
 @cli.command()
