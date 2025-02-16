@@ -1,15 +1,6 @@
-from typing import Optional, Callable
-
-
-class UsbDataParser(object):
+class UsbDataProcessor(object):
     def __init__(self):
-        self._callback_after_parsing: Optional[Callable] = None
-
-    def set_callback_after_parsing(self, callback: Callable):
-        if callable(callback):
-            self._callback_after_parsing = callback
-        else:
-            raise TypeError("Callback must be callable")
+        ...
 
     def parse(self, data):
         """
@@ -17,15 +8,7 @@ class UsbDataParser(object):
         :param data: obtained encoded data
         :return: decoded and processed data
         """
-        data.decode()
-
-    def parse_wrapper(self, data: bytes):
-        """
-        Auto calling callback after processing data
-        :param data: raw data
-        :return: result of callback
-        """
-        return self._callback_after_parsing(self.parse(data))
+        return data.decode()
 
     def serialize(self, data):
         return data.encode()

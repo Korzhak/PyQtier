@@ -42,7 +42,6 @@ class PyQtierWidgetBase(PyQtierBase, QWidget):
     def __init__(self, view_class, config, parent=None):
         QWidget.__init__(self, parent)
         PyQtierBase.__init__(self, view_class, config)
-        self.create_behavior()
 
 
 class PyQtierMainWindow(PyQtierBase, QMainWindow):
@@ -50,7 +49,6 @@ class PyQtierMainWindow(PyQtierBase, QMainWindow):
         QMainWindow.__init__(self)
         PyQtierBase.__init__(self, view_class, config)
         self.setWindowTitle(config.APP_NAME)
-        self.create_behavior()
 
     def _save_additional_state(self):
         self.settings.setValue("state", self.saveState())
