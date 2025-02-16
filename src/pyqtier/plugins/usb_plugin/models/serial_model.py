@@ -7,7 +7,7 @@ from serial.tools import list_ports
 
 from .data_processor import UsbDataProcessor
 
-DELAY_BETWEEN_READING = 7  # msec
+DELAY_BETWEEN_READING = 1  # msec
 CONNECTION_CHECK_INTERVAL = 500  # msec
 DEVICE_LIST_UPDATE_INTERVAL = 1000  # msec
 
@@ -211,4 +211,5 @@ class SerialModel(QThread):
     # ===== INTERNAL METHODS =====
     def _parsing(self, data: bytes):
         parsed_data = self.data_processor.parse(data)
-        self.data_ready.emit(parsed_data)
+        if parsed_data:
+            self.data_ready.emit(parsed_data)
