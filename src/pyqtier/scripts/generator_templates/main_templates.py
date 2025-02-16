@@ -3,7 +3,7 @@ MAIN = '''# !/usr/bin/env python
 Utility for running PyQtier desktop applications.
 """
 
-from app.app_manager import ApplicationManager
+from app import ApplicationManager
 
 
 def main():

@@ -15,3 +15,9 @@ class ApplicationManager(PyQtierApplicationManager):
         self.main_window.open_about.connect(self.about_window.show)
 
 '''
+
+MANAGER_INIT = '''from .app_manager import ApplicationManager
+
+__all__ = ['ApplicationManager']
+
+'''

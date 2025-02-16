@@ -1,5 +1,5 @@
 from .main_templates import MAIN
-from .manager_templates import MANAGER
+from .manager_templates import MANAGER, MANAGER_INIT
 from .config_templates import CONFIG
 from .widget_templates import MAIN_WINDOW, ABOUT_WINDOW, SETTINGS_WINDOW, INIT
 from .views_templates import INIT_VIEWS
@@ -16,6 +16,7 @@ ui_dir = UI_DIR.relative_to(ROOT_DIR)
 TEMPLATES = {
     "main.py": MAIN,
 
+    str(app_dir / "__init__.py"): MANAGER_INIT,
     str(app_dir / "app_manager.py"): MANAGER,
     str(app_dir / "config.py"): CONFIG,
 
