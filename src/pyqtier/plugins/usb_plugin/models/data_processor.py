@@ -3,11 +3,6 @@ class UsbDataProcessor(object):
         ...
 
     def parse(self, data):
-        """
-        Do not forget calling callback after processing data if you rewrite parser
-        :param data: obtained encoded data
-        :return: decoded and processed data
-        """
         return data.decode()
 
     def serialize(self, data):
