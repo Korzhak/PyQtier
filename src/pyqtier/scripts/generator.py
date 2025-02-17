@@ -21,8 +21,8 @@ def create_project(project_name: str):
     directories = [
         'app',
         'app/models',
-        'app/views',
-        'app/views/templates',
+        'app/templates',
+        'app/templates/ui',
         'app/presenters'
     ]
 

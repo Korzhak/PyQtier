@@ -1,5 +1,9 @@
 import time
-from typing import Callable, Any
+from typing import Callable, Any, Optional
+
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import QTimer
+from serial.tools import list_ports
 
 from .auxiliary import *
 from .models.data_parser import UsbDataParser
@@ -7,8 +11,40 @@ from .models.serial_model import SerialModel, STATUS_OK
 from ..plugins import PyQtierPlugin
 
 
+class UsbPortMonitor:
+    def __init__(self, manager):
+        self.manager: UsbPluginManager = manager
+        self.connected_ports = set()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._check_ports)
+        self.timer.start(1000)  # Перевірка кожну секунду
+
+        # Початкове зчитування портів
+        self._update_ports()
+
+    def _update_ports(self):
+        self.connected_ports = {port.device for port in list_ports.comports()}
+
+    def _check_ports(self):
+        current_ports = {port.device for port in list_ports.comports()}
+
+        # Перевірка відключених пристроїв
+        disconnected = self.connected_ports - current_ports
+        if disconnected and self.manager.is_connected():
+            if self.manager.get_current_serial_port() in disconnected:
+                self.manager.disconnect()
+                self.manager.obtain_error_callback("Пристрій було відключено")
+
+        # Перевірка нових пристроїв
+        if current_ports != self.connected_ports:
+            self.manager._cb_list_usb_devices_callback()
+
+        self.connected_ports = current_ports
+
+
 class UsbPluginManager(PyQtierPlugin):
-    def __init__(self, with_baudrate: bool = False, default_baudrate: int = 9600):
+    def __init__(self, with_baudrate: bool = False, default_baudrate: int = 9600,
+                 callback_loose_connection: Optional[callable] = None):
         super().__init__()
         if with_baudrate:
             from .views.usb_control_with_baudrate import Ui_UsbWidget
@@ -29,8 +65,34 @@ class UsbPluginManager(PyQtierPlugin):
         self._obtain_data_callback: Callable = lambda: ...
         self._obtain_error_callback: Callable = lambda: ...
 
+        self.port_monitor = UsbPortMonitor(self)
+
+        self._callback_loose_connection: Optional[callable] = callback_loose_connection
+
         # TODO: realize themes for plugin
         self.theme_settings: dict[str: Any[str, bool]] = THEME_SETTINGS
+
+    def get_current_serial_port(self):
+        return self._serial.get_current_serial_port()
+
+    def disconnect(self):
+        if self._serial.is_connected:
+            self._connect_disconnect_callback()
+
+    def is_connected(self):
+        return self._serial.is_connected
+
+    def obtain_error_callback(self, error_message: str):
+        """Callback для обробки помилок"""
+        self.set_button_for_connect()
+        error_dialog = QtWidgets.QMessageBox()
+        error_dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        error_dialog.setWindowTitle("Помилка")
+        error_dialog.setText(error_message)
+        error_dialog.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        error_dialog.exec_()
+        if self._callback_loose_connection:
+            self._callback_loose_connection()
 
     def setup_view(self, *args, **kwargs):
         super().setup_view(*args, **kwargs)
@@ -43,26 +105,14 @@ class UsbPluginManager(PyQtierPlugin):
 
         self.add_behaviours()
 
-    def set_obtain_data_callback(self, callback: Callable):
-        """
-        Function which obtain data after obtaining and parsing
-        :param callback: function
-        :return: None
-        """
-        if callable(callback):
-            self._serial.set_after_parsing_callback(callback)
-            self._obtain_data_callback = self._serial.get_parse_callback()
+    def set_data_serializer(self, serializer: callable):
+        self._serial.set_data_serializer(serializer)
 
-            self._serial.data_received.connect(self._obtain_data_callback)
-        else:
-            raise TypeError("Callback must be callable")
+    def set_after_parsing_data_callback(self, callback):
+        self._serial.set_after_parsing_callback(callback)
 
     def set_obtain_error_callback(self, callback: Callable):
-        if callable(callback):
-            self._obtain_error_callback = callback
-            self._serial.error_occurred.connect(self._obtain_error_callback)
-        else:
-            raise TypeError("Callback must be callable")
+        self._serial.set_error_callback(callback)
 
     def set_data_parser(self, data_parser: UsbDataParser):
         """
@@ -75,6 +125,18 @@ class UsbPluginManager(PyQtierPlugin):
     def add_behaviours(self):
         self._ui.bt_connect_disconnect.clicked.connect(self._connect_disconnect_callback)
 
+    def set_button_for_connect(self):
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/buttons_img/img/connect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self._ui.bt_connect_disconnect.setIcon(icon)
+        self._ui.bt_connect_disconnect.setIconSize(QtCore.QSize(27, 27))
+
+    def set_button_for_disconnect(self):
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/buttons_img/img/disconnect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self._ui.bt_connect_disconnect.setIcon(icon)
+        self._ui.bt_connect_disconnect.setIconSize(QtCore.QSize(27, 27))
+
     def _connect_disconnect_callback(self):
         """
 
@@ -86,8 +148,7 @@ class UsbPluginManager(PyQtierPlugin):
 
             self._serial.disconnect()
 
-            # self.bt_com.setIcon(self.__icon_com_connect)
-            self._ui.bt_connect_disconnect.setText("Connect")
+            self.set_button_for_connect()
 
             if self._statusbar:
                 self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} disconnected!", 4000)
@@ -100,8 +161,8 @@ class UsbPluginManager(PyQtierPlugin):
 
             # Checking if connecting successfully
             if self._serial.connect() == STATUS_OK:
-                # self.bt_com.setIcon(self.__icon_com_disconnect)
-                self._ui.bt_connect_disconnect.setText("Disconnect")
+                self.set_button_for_disconnect()
+
                 if self._statusbar:
                     self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} connected!", 4000)
                 self._start_send_data_callback()
@@ -120,7 +181,9 @@ class UsbPluginManager(PyQtierPlugin):
         if current_device in available_devices:
             self._ui.cb_list_usb_devices.setCurrentIndex(available_devices.index(current_device))
 
-    def send(self, data: str) -> int:
+    def send(self, data: str, callback=None) -> int:
+        if callback:
+            self.set_after_parsing_data_callback(callback)
         return self._serial.write(data)
 
     @staticmethod
