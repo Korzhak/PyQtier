@@ -1,16 +1,33 @@
+from enum import Enum, auto
 from typing import Callable, Optional
 
 import serial
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from serial.tools import list_ports
 
-from .data_parser import UsbDataParser, UsbDataSerializer
-from .statuses import *
+from .data_processor import UsbDataProcessor
+
+DELAY_BETWEEN_READING = 1  # msec
+CONNECTION_CHECK_INTERVAL = 500  # msec
+DEVICE_LIST_UPDATE_INTERVAL = 1000  # msec
+
+
+class Statuses(Enum):
+    OK = auto()
+    ERROR = auto()
+    STATUS_ERROR_CONNECTION_TIMEOUT = auto()
+    DATA_PARSER_DID_NOT_SET = auto()
+    DEVICE_DISCONNECTED = auto()
 
 
 class SerialModel(QThread):
-    data_received = pyqtSignal(bytes)
+    raw_data_received = pyqtSignal(bytes)
     error_occurred = pyqtSignal(str)
+    data_ready = pyqtSignal(dict)
+    connection_lost = pyqtSignal()
+    connect_signal = pyqtSignal()
+    disconnect_signal = pyqtSignal()
+    devices_list_updated = pyqtSignal(list)  # New signal for device list updates
 
     def __init__(self):
         super().__init__()
@@ -19,98 +36,137 @@ class SerialModel(QThread):
         self._serial_port = "COM1"
         self._ser = None
         self._is_serial_connected = False
-        self._com_connection_lost_callback = None
-        self._data_parser: Optional[UsbDataParser] = None
-        self._data_serializer: Optional[UsbDataSerializer] = None
-        self._error_callback: callable = None
+        self.data_processor: Optional[UsbDataProcessor] = None
 
+        # Connection monitoring timer
+        self._connection_timer = QTimer(self)
+        self._connection_timer.timeout.connect(self._check_connection)
+
+        # Device list update timer
+        self._device_list_timer = QTimer(self)
+        self._device_list_timer.timeout.connect(self._update_device_list)
+
+        # Keep track of last known devices
+        self._last_known_devices = set()
+
+        self.start_monitoring_devices_list()
+
+    def start_monitoring(self):
+        """Start connection monitoring and device list updating"""
+        self._connection_timer.start(CONNECTION_CHECK_INTERVAL)
+
+    def start_monitoring_devices_list(self):
+        self._device_list_timer.start(DEVICE_LIST_UPDATE_INTERVAL)
+
+    def stop_monitoring(self):
+        """Stop connection monitoring and device list updating"""
+        self._connection_timer.stop()
+
+    def stop_monitoring_devices_list(self):
+        self._device_list_timer.stop()
+
+    def _check_connection(self):
+        """Check if the current connection is still valid"""
+        if self._is_serial_connected and self._ser:
+            try:
+                # Check if the port is still available
+                if self._serial_port not in [p.device for p in list_ports.comports()]:
+                    self._handle_connection_loss()
+                    return
+
+                # Try to write a null byte to check connection
+                self._ser.write(b'\x00')
+            except (serial.SerialException, IOError):
+                self._handle_connection_loss()
+
+    def _handle_connection_loss(self):
+        """Handle connection loss events"""
+        self._is_serial_connected = False
+        self.error_occurred.emit("Connection lost")
+        self.connection_lost.emit()
+        self.disconnect()
+
+    def _update_device_list(self):
+        """Update the list of available devices and emit if changed"""
+        current_devices = set(self.get_available_ports())
+        if current_devices != self._last_known_devices:
+            self._last_known_devices = current_devices
+            self.devices_list_updated.emit(list(current_devices))
+
+    # ===== SETTINGS SERIAL PORTS =====
     def set_connection_type(self, is_connection_via_usb: bool):
         self._is_connection_via_usb = is_connection_via_usb
 
-    def set_com_connection_lost_callback(self, callback: Callable):
-        if callable(callback):
-            self._com_connection_lost_callback = callback
-            return STATUS_OK
-        return STATUS_OBJECT_NOT_CALLABLE
-
-    def set_serial_port(self, serial_port: str) -> int:
+    def set_serial_port(self, serial_port: str):
         """
         Setter of Serial port.
         :param serial_port: str name of Serial ports
-        :return: 0 if everything is OK,
-                 1 if not (FAILED)
         """
-        if isinstance(serial_port, str):
-            self._serial_port = serial_port
-            return STATUS_OK
-        return STATUS_ERROR
+        self._serial_port = serial_port
 
-    def set_baud_rate(self, br: int = 115200) -> int:
+    def set_baud_rate(self, br: int = 115200):
         """
         Method for setting baud rate
         :param br: can be 9600 - 115200 (default value)
-        :return: 0 if everything is OK,
-                 1 if not (FAILED)
         """
-        if isinstance(br, int):
-            self._baud_rate = br
-            return STATUS_OK
-        return STATUS_ERROR
+        self._baud_rate = br
 
-    def set_data_parser(self, data_parser: UsbDataParser):
-        self._data_parser = data_parser
-        self.data_received.connect(self.get_parse_callback())
+    # ===== SETTINGS CALLBACKS =====
+    def set_data_processor(self, data_processor: UsbDataProcessor):
+        self.raw_data_received.connect(self._parsing)
+        self.data_processor = data_processor
+
+    def set_data_ready_callback(self, callback: Callable):
+        self.data_ready.connect(callback)
 
     def set_error_callback(self, callback: Callable):
-        self._error_callback = callback
-        self.error_occurred.connect(self._error_callback)
+        self.error_occurred.connect(callback)
 
-    def set_data_serializer(self, data_serializer: UsbDataSerializer):
-        self._data_serializer = data_serializer
+    def set_connection_lost_callback(self, callback: Callable):
+        self.connection_lost.connect(callback)
 
-    def set_after_parsing_callback(self, callback: Callable):
-        self._data_parser.set_callback_after_parsing(callback)
+    def set_connect_callback(self, callback: Callable):
+        self.connect_signal.connect(callback)
 
-    def get_parse_callback(self) -> Callable:
-        return self._data_parser.parse_wrapper
+    def set_disconnect_callback(self, callback: Callable):
+        self.disconnect_signal.connect(callback)
 
-    @property
-    def is_connected(self) -> bool:
-        return self._is_serial_connected
-
-    def connect(self) -> int:
+    # ===== SERIAL PROCESSING =====
+    def connect(self) -> Statuses:
         """
         Method which is connecting to Serial device.
-        :return: 0 if everything is OK,
-                 1 if SerialException (FAILED)
+        :return: Status of the connection attempt
         """
         try:
             self._ser = serial.Serial(self._serial_port, self._baud_rate)
             self.start()
-        except serial.SerialException:
-            return STATUS_ERROR
+            self.start_monitoring()  # Start monitoring when connected
+        except serial.SerialException as err:
+            self.error_occurred.emit(str(err))
+            return Statuses.ERROR
         else:
             self._is_serial_connected = True
-            return STATUS_OK
+            self.connect_signal.emit()
+            return Statuses.OK
 
-    def disconnect(self) -> int:
+    def disconnect(self) -> Statuses:
         """
         Method which is disconnecting from Serial device.
-        :return: 0 if everything is OK,
-                 1 if SerialException (FAILED)
+        :return: Status of the disconnection attempt
         """
         try:
             self._is_serial_connected = False
+            self.stop_monitoring()  # Stop monitoring when disconnected
             self.wait()
-            self._ser.close()
-        except serial.SerialException:
-            return STATUS_ERROR
-        except AttributeError:
-            return STATUS_ERROR
+            if self._ser and self._ser.is_open:
+                self._ser.close()
+            self.disconnect_signal.emit()
+        except serial.SerialException as err:
+            return Statuses.ERROR
         else:
-            return STATUS_OK
+            return Statuses.OK
 
-    def write(self, data) -> int:
+    def write(self, data) -> Statuses:
         """
         Write data to serial port
         :param data:
@@ -118,26 +174,30 @@ class SerialModel(QThread):
         """
         if self._is_serial_connected:
             try:
-                if self._data_serializer is not None:
-                    serialized_data = self._data_serializer.serialize(data)
+                if self._data_parser is not None:
+                    serialized_data = self._data_parser.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
-                    return 0
-            except serial.serialutil.SerialTimeoutException:
+                    return Statuses.DATA_PARSER_DID_NOT_SET
+            except serial.serialutil.SerialTimeoutException as err:
                 # Якщо COM-порту не знайдено - розриваємо зв'язок
-                self.disconnect()
-                self._com_connection_lost_callback()
-                return STATUS_ERROR_CONNECTION_TIMEOUT
+                self.error_occurred.emit(str(err))
+                return Statuses.STATUS_ERROR_CONNECTION_TIMEOUT
 
     def run(self):
         try:
             while self.is_connected:
                 if self._ser.in_waiting:
                     data = self._ser.read(self._ser.in_waiting)
-                    self.data_received.emit(data)
-                self.msleep(10)  # small delay for decrease load
-        except Exception as e:
-            self.error_occurred.emit(str(e))
+                    self.raw_data_received.emit(data)
+                self.msleep(DELAY_BETWEEN_READING)  # small delay for decrease load
+        except Exception as err:
+            self.error_occurred.emit(str(err))
+
+    # ===== GETTERS =====
+    @property
+    def is_connected(self) -> bool:
+        return self._is_serial_connected
 
     @staticmethod
     def get_available_ports(item_as_str: bool = True) -> list[str]:
@@ -148,5 +208,8 @@ class SerialModel(QThread):
         """
         return [str(i) for i in list_ports.comports()] if item_as_str else list_ports.comports()
 
-    def get_current_serial_port(self):
-        return self._serial_port
+    # ===== INTERNAL METHODS =====
+    def _parsing(self, data: bytes):
+        parsed_data = self.data_processor.parse(data)
+        if parsed_data:
+            self.data_ready.emit(parsed_data)

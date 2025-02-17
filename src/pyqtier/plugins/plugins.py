@@ -25,5 +25,17 @@ class PyQtierPlugin:
         self._statusbar = statusbar
         self._ui.setupUi(self._widget)
 
-    def add_behaviour(self):
+    def create_behavior(self):
         ...
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def version(self):
+        return self._version
+
+    @property
+    def description(self):
+        return self._description
