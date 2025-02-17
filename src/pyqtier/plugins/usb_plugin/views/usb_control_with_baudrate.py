@@ -16,6 +16,7 @@ class Ui_UsbWidget(object):
         UsbWidget.setObjectName("UsbWidget")
         UsbWidget.resize(400, 99)
         self.horizontalLayout = QtWidgets.QHBoxLayout(UsbWidget)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.frame = QtWidgets.QFrame(UsbWidget)
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)

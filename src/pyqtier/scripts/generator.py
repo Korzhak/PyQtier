@@ -1,6 +1,5 @@
-# generator.py
 from pathlib import Path
-
+import shutil
 import click
 
 from .generator_templates import TEMPLATES
@@ -8,7 +7,7 @@ from .converter import convert_ui_to_py
 from .config import *
 
 
-def create_project(project_name: str):
+def create_project(project_name: str, project_path: str = '.'):
     """
     Generate a new PyQtier project structure
     Args:
