@@ -6,7 +6,6 @@ build/
 config.ini
 simulating_results/*
 extra
-requirements.txt
 dist
 *.egg-info
 
