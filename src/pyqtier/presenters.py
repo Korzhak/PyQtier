@@ -121,4 +121,4 @@ class PyQtierMainWindowPresenter(AbstractPresenter):
         Add callbacks
         :return: None
         """
-        self.ui.actionQuit.triggered.connect(self.quit)
+        self.ui.actionQuit.triggered.connect(self.widget.close)

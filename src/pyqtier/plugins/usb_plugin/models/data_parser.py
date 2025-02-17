@@ -1,6 +1,25 @@
 from typing import Optional, Callable
 
 
+class UsbDataSerializer(object):
+    def serialize(self, data):
+        return data
+
+    @staticmethod
+    def calculate_crc(data: bytes) -> int:
+        """
+        Calculating CRC16
+        :param data: data for calculating CRC16
+        :return: value of CRC16 (2 bytes)
+        """
+        crc = 0xFFFF
+        for byte in data:
+            crc ^= (byte << 8)
+            for _ in range(0, 8):
+                crc = (crc << 1) ^ 0x1021 if (crc & 0x8000) else crc << 1
+        return crc & 0xFFFF
+
+
 class UsbDataParser(object):
     def __init__(self):
         self._callback_after_parsing: Optional[Callable] = None
@@ -25,10 +44,8 @@ class UsbDataParser(object):
         :param data: raw data
         :return: result of callback
         """
-        return self._callback_after_parsing(self.parse(data))
-
-    def serialize(self, data):
-        return data.encode()
+        for decoded_data in data.decode().split("\r\n"):
+            self._callback_after_parsing(self.parse(decoded_data))
 
     @staticmethod
     def calculate_crc(data: bytes) -> int:

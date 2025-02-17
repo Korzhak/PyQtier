@@ -4,7 +4,7 @@ import serial
 from PyQt5.QtCore import QThread, pyqtSignal
 from serial.tools import list_ports
 
-from .data_parser import UsbDataParser
+from .data_parser import UsbDataParser, UsbDataSerializer
 from .statuses import *
 
 
@@ -21,6 +21,8 @@ class SerialModel(QThread):
         self._is_serial_connected = False
         self._com_connection_lost_callback = None
         self._data_parser: Optional[UsbDataParser] = None
+        self._data_serializer: Optional[UsbDataSerializer] = None
+        self._error_callback: callable = None
 
     def set_connection_type(self, is_connection_via_usb: bool):
         self._is_connection_via_usb = is_connection_via_usb
@@ -56,10 +58,15 @@ class SerialModel(QThread):
         return STATUS_ERROR
 
     def set_data_parser(self, data_parser: UsbDataParser):
-        if isinstance(data_parser, UsbDataParser):
-            self._data_parser = data_parser
-        else:
-            raise TypeError("Argument must be a DataParser object")
+        self._data_parser = data_parser
+        self.data_received.connect(self.get_parse_callback())
+
+    def set_error_callback(self, callback: Callable):
+        self._error_callback = callback
+        self.error_occurred.connect(self._error_callback)
+
+    def set_data_serializer(self, data_serializer: UsbDataSerializer):
+        self._data_serializer = data_serializer
 
     def set_after_parsing_callback(self, callback: Callable):
         self._data_parser.set_callback_after_parsing(callback)
@@ -111,8 +118,8 @@ class SerialModel(QThread):
         """
         if self._is_serial_connected:
             try:
-                if self._data_parser is not None:
-                    serialized_data = self._data_parser.serialize(data)
+                if self._data_serializer is not None:
+                    serialized_data = self._data_serializer.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
                     return 0
@@ -140,3 +147,6 @@ class SerialModel(QThread):
         :return: List of available serial ports
         """
         return [str(i) for i in list_ports.comports()] if item_as_str else list_ports.comports()
+
+    def get_current_serial_port(self):
+        return self._serial_port
