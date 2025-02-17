@@ -1,60 +1,108 @@
-# PyQtier (BETA)
+# PyQtier
 
-Make your onw desktop app faster
+PyQtier is a command-line tool and architecture solution that helps you work with PyQt5 projects simpler and faster,
+providing convenient commands for project creation, UI file conversion, and Qt Designer integration.
 
-## Quick start
+![screenshot_1.png](docs/img/screenshot_1.png)
 
-### Installing
+## Features
 
-1. Creating virtual environment
+- Command-line interface for project management
+- Built-in GUI application with modern interface
+- Qt Designer integration
+- Automatic UI and resource file conversion
+- Project scaffolding and architecture solutions
 
-```bash
-virtualenv -p python3 .venv
-```
-
-2. Activating venv
-
-**Linux / MacOS**
-
-```bash
-source .venv/bin/activate
-```
-
-**Windows**
-
-```bash
-.\.venv\Scripts\activate
-```
-
-3. Installing last version of module
+## Installation
 
 ```bash
 pip install pyqtier
 ```
 
-_If you want, you can install last test version from Test PyPI_
+## Commands
+
+> **Note:** You can use `pyqtier` or shorter `pqr` command to run the commands.
+
+### Start a New Project
+
+Create a new PyQt5 project structure:
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pyqtier
+pyqtier startproject PROJECT_NAME
 ```
 
-### Creating project
+- `PROJECT_NAME`: Name and path of your project. Use `.` to create the project in the current directory.
 
-For creating project you need to run follow command: 
+### Open Qt Designer
+
+Launch Qt Designer for creating UI files:
+
 ```bash
-pyqtier startproject <project_path_and_name>
+pyqtier designer
 ```
 
-where `<project_path_and_name>` can be just `.` if you want to create project in current folder.
+Note: Requires `qt5-tools` to be installed on your system.
 
-### Run project
+### Convert UI Files
 
-```bash 
-python main.py
+Convert Qt Designer `.ui` files to Python `.py` files:
+
+```bash
+# Convert all .ui files in the project
+pyqtier convertui
+
+# Convert a specific .ui file
+pyqtier convertui filename.ui
+
+# Convert .ui files and automatically convert associated .qrc files
+pyqtier convertui --autorc
 ```
 
-## Detailed docs
+### Convert Resource Files
 
-1. [Plugins](docs/PLUGINS.md)
+Convert Qt resource `.qrc` files to Python `.py` files:
+
+```bash
+# Convert all .qrc files in the project
+pyqtier convertqrc
+
+# Convert a specific .qrc file
+pyqtier convertqrc filename.qrc
+```
+
+## Examples
+
+1. Create a new project:
+   ```bash
+   pyqtier startproject .
+   ```
+
+2. Design your UI:
+   ```bash
+   pyqtier designer
+   ```
+
+3. Convert UI and resource files:
+   ```bash
+   # Convert all UI files and automatically convert QRC files
+   pyqtier convertui --autorc
+   
+   # Convert a specific UI file
+   pyqtier convertui main_window.ui
+   
+   # Convert a specific resource file
+   pyqtier convertqrc resources.qrc
+   ```
+
+## Requirements
+
+- Python 3.x
+- PyQt5
+- qt5-tools (for Qt Designer)
+- click (for CLI interface)
+
+## License
+
+**MIT**
 
 
