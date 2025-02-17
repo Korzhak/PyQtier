@@ -41,7 +41,6 @@ packages = [
     "pyqtier.scripts",
     "pyqtier.widgets",
     "pyqtier.views",
-    "pyqtier.views.templates",
     "pyqtier.plugins",
     "pyqtier.plugins.usb_plugin",
     "pyqtier.plugins.usb_plugin.models",
