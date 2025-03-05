@@ -16,7 +16,7 @@ class Statuses(Enum):
     OK = auto()
     ERROR = auto()
     STATUS_ERROR_CONNECTION_TIMEOUT = auto()
-    DATA_PARSER_DID_NOT_SET = auto()
+    DATA_PROCESSOR_DID_NOT_SET = auto()
     DEVICE_DISCONNECTED = auto()
 
 
@@ -174,8 +174,8 @@ class SerialModel(QThread):
         """
         if self._is_serial_connected:
             try:
-                if self._data_parser is not None:
-                    serialized_data = self._data_parser.serialize(data)
+                if self.data_processor is not None:
+                    serialized_data = self.data_processor.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
                     return Statuses.DATA_PARSER_DID_NOT_SET
