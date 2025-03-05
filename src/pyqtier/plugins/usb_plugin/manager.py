@@ -38,6 +38,9 @@ class UsbPluginManager(PyQtierPlugin):
     def create_behavior(self):
         self._ui.bt_connect_disconnect.clicked.connect(self._connect_disconnect_callback)
 
+    def send_data(self, data: dict):
+        self._serial.write(data)
+
     # ===== SETTERS =====
     def set_obtain_data_callback(self, callback):
         self._serial.set_data_ready_callback(callback)
