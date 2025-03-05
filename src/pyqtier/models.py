@@ -20,5 +20,5 @@ class Singleton:
         :return: Singleton object
         """
         if cls._instance is None:
-            cls._instance = Singleton()
+            cls._instance = cls()
         return cls._instance
