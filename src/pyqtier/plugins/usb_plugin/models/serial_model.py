@@ -1,3 +1,4 @@
+import warnings
 from enum import Enum, auto
 from typing import Callable, Optional
 
@@ -37,6 +38,9 @@ class SerialModel(QThread):
         self._ser = None
         self._is_serial_connected = False
         self.data_processor: Optional[UsbDataProcessor] = None
+
+        self.permanent_data_ready_signals = []
+        self.temporary_data_ready_signal: Optional[callable] = None
 
         # Connection monitoring timer
         self._connection_timer = QTimer(self)
@@ -117,7 +121,20 @@ class SerialModel(QThread):
         self.data_processor = data_processor
 
     def set_data_ready_callback(self, callback: Callable):
+        warnings.warn("Call to a deprecated function 'set_data_ready_callback'.",
+                      category=DeprecationWarning,
+                      stacklevel=2)
         self.data_ready.connect(callback)
+
+    def set_permanent_data_ready_callback(self, callback: Callable):
+        self.permanent_data_ready_signals.append(callback)
+        self.data_ready.connect(callback)
+
+    def set_temporary_data_ready_callback(self, callback: Callable):
+        if self.temporary_data_ready_signal:
+            self.data_ready.disconnect(self.temporary_data_ready_signal)
+        self.data_ready.connect(callback)
+        self.temporary_data_ready_signal = callback
 
     def set_error_callback(self, callback: Callable):
         self.error_occurred.connect(callback)

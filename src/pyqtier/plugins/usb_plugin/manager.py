@@ -1,3 +1,4 @@
+import warnings
 from typing import Callable, Optional
 
 from .auxiliary import *
@@ -43,7 +44,16 @@ class UsbPluginManager(PyQtierPlugin):
 
     # ===== SETTERS =====
     def set_obtain_data_callback(self, callback):
+        warnings.warn("Call to a deprecated function 'set_obtain_data_callback'.",
+                      category=DeprecationWarning,
+                      stacklevel=2)
         self._serial.set_data_ready_callback(callback)
+
+    def set_permanent_obtain_data_callback(self, callback):
+        self._serial.set_permanent_data_ready_callback(callback)
+
+    def set_temporary_obtain_data_callback(self, callback):
+        self._serial.set_temporary_data_ready_callback(callback)
 
     def set_error_callback(self, callback):
         self._serial.set_error_callback(callback)
