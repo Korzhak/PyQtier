@@ -49,4 +49,4 @@ class Ui_UsbWidget(object):
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
 
 
-from pyqtier.widgets.custom_widgets import ExtendedComboBox
+from pyqtier.widgets import ExtendedComboBox
