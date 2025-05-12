@@ -20,7 +20,7 @@ class UsbPluginManager(PyQtierPlugin):
         self._with_baudrate: bool = with_baudrate
 
         if custom_ui:
-            self.custom_ui = custom_ui()
+            self._ui = custom_ui()
         else:
             self._ui = Ui_UsbWidget()
 
