@@ -74,8 +74,6 @@ class SerialModel(QThread):
                     self._handle_connection_loss()
                     return
 
-                # Try to write a null byte to check connection
-                self._ser.write(b'\x00')
             except (serial.SerialException, IOError):
                 self._handle_connection_loss()
 
