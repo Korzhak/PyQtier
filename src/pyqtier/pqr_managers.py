@@ -18,7 +18,11 @@ class PyQtierApplicationManager:
 
     def create_behaviour(self):
         ...
+    def show_main_window(self, show_maximized=False, show_full_screen=False):
+        if show_maximized:
+            self.main_window.showMaximized()
+        if show_full_screen:
+            self.main_window.showFullScreen()
 
-    def show_main_window(self):
         self.main_window.show()
         sys.exit(self.app.exec_())

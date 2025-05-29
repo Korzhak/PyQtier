@@ -7,7 +7,7 @@ from ..plugins import PyQtierPlugin
 
 
 class UsbPluginManager(PyQtierPlugin):
-    def __init__(self, with_baudrate: bool = False, default_baudrate: int = 9600):
+    def __init__(self, with_baudrate: bool = False, default_baudrate: int = 9600, custom_ui=None):
         super().__init__()
 
         if with_baudrate:
@@ -19,7 +19,11 @@ class UsbPluginManager(PyQtierPlugin):
 
         self._with_baudrate: bool = with_baudrate
 
-        self._ui = Ui_UsbWidget()
+        if custom_ui:
+            self._ui = custom_ui()
+        else:
+            self._ui = Ui_UsbWidget()
+
         self._serial: SerialModel = SerialModel()
 
         self._external_lost_connection_callback: Optional[Callable] = None

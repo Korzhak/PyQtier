@@ -73,9 +73,6 @@ class SerialModel(QThread):
                 if self._serial_port not in [p.device for p in list_ports.comports()]:
                     self._handle_connection_loss()
                     return
-
-                # Try to write a null byte to check connection
-                self._ser.write(b'\x00')
             except (serial.SerialException, IOError):
                 self._handle_connection_loss()
 
