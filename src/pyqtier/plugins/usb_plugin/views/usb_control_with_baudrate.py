@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'E:\Projects\Python\CableTester\app\templates\ui\usb_control_with_baudrate.ui'
+# Form implementation generated from reading ui file 'E:\Projects\PyQtier\src\pyqtier\plugins\usb_plugin\views\templates\usb_control_with_baudrate.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -16,7 +16,6 @@ class Ui_UsbWidget(object):
         UsbWidget.setObjectName("UsbWidget")
         UsbWidget.resize(400, 99)
         self.horizontalLayout = QtWidgets.QHBoxLayout(UsbWidget)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.frame = QtWidgets.QFrame(UsbWidget)
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -30,9 +29,6 @@ class Ui_UsbWidget(object):
         self.label_2 = QtWidgets.QLabel(self.frame)
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 0, 1, 1, 1)
-        self.label_3 = QtWidgets.QLabel(self.frame)
-        self.label_3.setObjectName("label_3")
-        self.gridLayout.addWidget(self.label_3, 0, 2, 1, 1)
         self.cb_list_usb_devices = ExtendedComboBox(self.frame)
         self.cb_list_usb_devices.setObjectName("cb_list_usb_devices")
         self.gridLayout.addWidget(self.cb_list_usb_devices, 1, 0, 1, 1)
@@ -52,8 +48,15 @@ class Ui_UsbWidget(object):
         UsbWidget.setWindowTitle(_translate("UsbWidget", "USB"))
         self.label.setText(_translate("UsbWidget", "USB Device"))
         self.label_2.setText(_translate("UsbWidget", "Baud rate"))
-        self.label_3.setText(_translate("UsbWidget", "Connection lost"))
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
+from pyqtier.widgets.extended_combobox_widget import ExtendedComboBox
 
 
-from pyqtier.widgets import ExtendedComboBox
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    UsbWidget = QtWidgets.QWidget()
+    ui = Ui_UsbWidget()
+    ui.setupUi(UsbWidget)
+    UsbWidget.show()
+    sys.exit(app.exec_())
