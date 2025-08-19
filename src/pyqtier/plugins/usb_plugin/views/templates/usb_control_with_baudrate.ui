@@ -45,7 +45,7 @@
   <customwidget>
    <class>ExtendedComboBox</class>
    <extends>QComboBox</extends>
-   <header>pyqtier.widgets.extended_combobox_widget</header>
+   <header>pyqtier.widgets.custom_widgets</header>
   </customwidget>
  </customwidgets>
  <resources/>

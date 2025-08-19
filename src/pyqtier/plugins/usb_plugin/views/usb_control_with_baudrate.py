@@ -41,4 +41,4 @@ class Ui_UsbWidget(object):
         _translate = QtCore.QCoreApplication.translate
         UsbWidget.setWindowTitle(_translate("UsbWidget", "USB"))
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
-from pyqtier.widgets.extended_combobox_widget import ExtendedComboBox
+from pyqtier.widgets.custom_widgets import ExtendedComboBox

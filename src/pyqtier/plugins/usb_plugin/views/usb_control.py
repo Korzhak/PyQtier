@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_UsbWidget(object):
     def setupUi(self, UsbWidget):
         UsbWidget.setObjectName("UsbWidget")
-        UsbWidget.resize(400, 80)
+        UsbWidget.resize(400, 88)
         self.horizontalLayout = QtWidgets.QHBoxLayout(UsbWidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.frame = QtWidgets.QFrame(UsbWidget)
@@ -25,13 +25,10 @@ class Ui_UsbWidget(object):
         self.gridLayout.setObjectName("gridLayout")
         self.cb_list_usb_devices = ExtendedComboBox(self.frame)
         self.cb_list_usb_devices.setObjectName("cb_list_usb_devices")
-        self.gridLayout.addWidget(self.cb_list_usb_devices, 1, 0, 1, 1)
-        self.label = QtWidgets.QLabel(self.frame)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.cb_list_usb_devices, 0, 0, 1, 1)
         self.bt_connect_disconnect = QtWidgets.QPushButton(self.frame)
         self.bt_connect_disconnect.setObjectName("bt_connect_disconnect")
-        self.gridLayout.addWidget(self.bt_connect_disconnect, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.bt_connect_disconnect, 0, 1, 1, 1)
         self.horizontalLayout.addWidget(self.frame)
 
         self.retranslateUi(UsbWidget)
@@ -40,6 +37,5 @@ class Ui_UsbWidget(object):
     def retranslateUi(self, UsbWidget):
         _translate = QtCore.QCoreApplication.translate
         UsbWidget.setWindowTitle(_translate("UsbWidget", "USB "))
-        self.label.setText(_translate("UsbWidget", "USB Device"))
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
-from pyqtier.widgets.extended_combobox_widget import ExtendedComboBox
+from pyqtier.widgets.custom_widgets import ExtendedComboBox
