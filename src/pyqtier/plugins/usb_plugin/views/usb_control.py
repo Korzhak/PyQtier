@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'E:\Projects\PyQtier\src\pyqtier\plugins\usb_plugin\views\templates\usb_control.ui'
+# Form implementation generated from reading ui file '/Users/user/Projects/TestPyQtier/TestPyQtier/app/views/templates/usb_control.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -42,14 +42,4 @@ class Ui_UsbWidget(object):
         UsbWidget.setWindowTitle(_translate("UsbWidget", "USB "))
         self.label.setText(_translate("UsbWidget", "USB Device"))
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
-from pyqtier.widgets.custom_widgets import ExtendedComboBox
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    UsbWidget = QtWidgets.QWidget()
-    ui = Ui_UsbWidget()
-    ui.setupUi(UsbWidget)
-    UsbWidget.show()
-    sys.exit(app.exec_())
+from pyqtier.widgets.extended_combobox_widget import ExtendedComboBox
