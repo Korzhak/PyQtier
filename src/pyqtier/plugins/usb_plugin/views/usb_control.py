@@ -42,7 +42,7 @@ class Ui_UsbWidget(object):
         UsbWidget.setWindowTitle(_translate("UsbWidget", "USB "))
         self.label.setText(_translate("UsbWidget", "USB Device"))
         self.bt_connect_disconnect.setText(_translate("UsbWidget", "Connect"))
-from pyqtier.widgets.extended_combobox_widget import ExtendedComboBox
+from pyqtier.widgets.custom_widgets import ExtendedComboBox
 
 
 if __name__ == "__main__":
