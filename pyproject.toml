@@ -1,6 +1,6 @@
 [project]
 name = "PyQtier"
-version = "1.0.37"
+version = "1.0.38"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
 ]
