@@ -1,4 +1,3 @@
-# views/modbus_control_with_baudrate.py
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtWidgets
@@ -31,13 +30,13 @@ class Ui_ModbusWidget(object):
         self.gridLayout.addWidget(self.cb_list_baudrates, 0, 1, 1, 1)
 
         # Slave ID
-        self.spinbox_slave_id = QtWidgets.QSpinBox(self.frame)
-        self.spinbox_slave_id.setMinimum(1)
-        self.spinbox_slave_id.setMaximum(247)
-        self.spinbox_slave_id.setValue(1)
-        self.spinbox_slave_id.setPrefix("ID: ")
-        self.spinbox_slave_id.setObjectName("spinbox_slave_id")
-        self.gridLayout.addWidget(self.spinbox_slave_id, 0, 2, 1, 1)
+        self.lineedit_slave_id = QtWidgets.QLineEdit(self.frame)
+        self.lineedit_slave_id.setText("1")
+        self.lineedit_slave_id.setPlaceholderText("ID:")
+        self.lineedit_slave_id.setObjectName("lineedit_slave_id")
+        validator = QtWidgets.QIntValidator(1, 247, self.frame)
+        self.lineedit_slave_id.setValidator(validator)
+        self.gridLayout.addWidget(self.lineedit_slave_id, 0, 2, 1, 1)
 
         # Connect Button
         self.bt_connect_disconnect = QtWidgets.QPushButton(self.frame)

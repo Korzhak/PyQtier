@@ -6,7 +6,7 @@ BAUDRATES_LIST = ["9600", "19200", "38400", "57600", "115200"]
 
 
 class ModbusPluginManager(PyQtierPlugin):
-    def __init__(self, with_baudrate: bool = True, default_baudrate: int = 9600, default_slave_id: int = 1):
+    def __init__(self, with_baudrate: bool = True, default_baudrate: int = 9600, default_slave_id: int = 1, custom_ui=None):
         super().__init__()
 
         if with_baudrate:
@@ -19,7 +19,10 @@ class ModbusPluginManager(PyQtierPlugin):
         self._with_baudrate = with_baudrate
         self._default_slave_id = default_slave_id
 
-        self._ui = Ui_ModbusWidget()
+        if custom_ui:
+            self._ui = custom_ui()
+        else:
+            self._ui = Ui_ModbusWidget()
         self._modbus = ModbusModel()
 
     def setup_view(self, *args, **kwargs):
@@ -35,7 +38,7 @@ class ModbusPluginManager(PyQtierPlugin):
             self._ui.cb_list_baudrates.setCurrentIndex(BAUDRATES_LIST.index(str(self._default_baudrate)))
 
         # Налаштування slave_id
-        self._ui.spinbox_slave_id.setValue(self._default_slave_id)
+        self._ui.lineedit_slave_id.setText(str(self._default_slave_id))
 
         # Підписка на внутрішні сигнали
         self._modbus.connected.connect(self._on_connected)
@@ -53,61 +56,75 @@ class ModbusPluginManager(PyQtierPlugin):
         List[int], List[bool], None]:
         """Універсальний метод читання"""
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.read(slave_id, function_code, address, count)
 
     def write(self, function_code: int, address: int, value: Union[int, bool, List[int], List[bool]],
               slave_id: int = None) -> bool:
         """Універсальний метод запису"""
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.write(slave_id, function_code, address, value)
 
     # ===== МЕТОДИ ЧИТАННЯ =====
 
     def read_holding_registers(self, address: int, count: int = 1, slave_id: int = None) -> Union[List[int], None]:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.read_holding_registers(slave_id, address, count)
 
     def read_input_registers(self, address: int, count: int = 1, slave_id: int = None) -> Union[List[int], None]:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.read_input_registers(slave_id, address, count)
 
     def read_coils(self, address: int, count: int = 1, slave_id: int = None) -> Union[List[bool], None]:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.read_coils(slave_id, address, count)
 
     def read_discrete_inputs(self, address: int, count: int = 1, slave_id: int = None) -> Union[List[bool], None]:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.read_discrete_inputs(slave_id, address, count)
 
     # ===== МЕТОДИ ЗАПИСУ =====
 
     def write_register(self, address: int, value: int, slave_id: int = None) -> bool:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.write_single_register(slave_id, address, value)
 
     def write_registers(self, address: int, values: List[int], slave_id: int = None) -> bool:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.write_multiple_registers(slave_id, address, values)
 
     def write_coil(self, address: int, value: bool, slave_id: int = None) -> bool:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.write_single_coil(slave_id, address, value)
 
     def write_coils(self, address: int, values: List[bool], slave_id: int = None) -> bool:
         if slave_id is None:
-            slave_id = self._ui.spinbox_slave_id.value()
+            slave_id = self._get_slave_id()
         return self._modbus.write_multiple_coils(slave_id, address, values)
 
     # ===== ВНУТРІШНІ МЕТОДИ =====
+
+    def _get_slave_id(self) -> int:
+        """Отримати slave_id з LineEdit з валідацією"""
+        try:
+            text = self._ui.lineedit_slave_id.text()
+            if not text:
+                return self._default_slave_id
+            slave_id = int(text)
+            if 1 <= slave_id <= 247:
+                return slave_id
+            else:
+                return self._default_slave_id
+        except ValueError:
+            return self._default_slave_id
 
     def _connect(self):
         port = self._ui.cb_serial_ports.currentText()
@@ -167,7 +184,7 @@ class ModbusPluginManager(PyQtierPlugin):
         return ModbusModel.get_available_ports()
 
     def get_slave_id(self) -> int:
-        return self._ui.spinbox_slave_id.value()
+        return self._get_slave_id()
 
     # ===== ДОСТУП ДО СИГНАЛІВ =====
 
