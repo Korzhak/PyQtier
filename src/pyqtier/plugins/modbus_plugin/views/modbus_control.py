@@ -21,7 +21,6 @@ class Ui_ModbusWidget(object):
 
         # Slave ID
         self.lineedit_slave_id = QtWidgets.QLineEdit(self.frame)
-        self.lineedit_slave_id.setText("1")
         self.lineedit_slave_id.setPlaceholderText("ID:")
         self.lineedit_slave_id.setObjectName("lineedit_slave_id")
         self.gridLayout.addWidget(self.lineedit_slave_id, 0, 0, 1, 1)
