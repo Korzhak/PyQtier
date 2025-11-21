@@ -46,6 +46,9 @@ packages = [
     "pyqtier.plugins.usb_plugin",
     "pyqtier.plugins.usb_plugin.models",
     "pyqtier.plugins.usb_plugin.views",
+    "pyqtier.plugins.modbus_plugin",
+    "pyqtier.plugins.modbus_plugin.models",
+    "pyqtier.plugins.modbus_plugin.views",
 ]
 
 [tool.setuptools.package-data]
