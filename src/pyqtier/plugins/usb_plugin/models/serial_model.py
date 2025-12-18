@@ -27,7 +27,7 @@ class SerialModel(QThread):
     connection_lost = pyqtSignal()
     connect_signal = pyqtSignal()
     disconnect_signal = pyqtSignal()
-    devices_list_updated = pyqtSignal(list)  # New signal for device list updates
+    devices_list_updated = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -112,21 +112,6 @@ class SerialModel(QThread):
     def set_data_processor(self, data_processor: UsbDataProcessor):
         self.raw_data_received.connect(self._parsing)
         self.data_processor = data_processor
-
-    def set_data_ready_callback(self, callback: Callable):
-        self.data_ready.connect(callback)
-
-    def set_error_callback(self, callback: Callable):
-        self.error_occurred.connect(callback)
-
-    def set_connection_lost_callback(self, callback: Callable):
-        self.connection_lost.connect(callback)
-
-    def set_connect_callback(self, callback: Callable):
-        self.connect_signal.connect(callback)
-
-    def set_disconnect_callback(self, callback: Callable):
-        self.disconnect_signal.connect(callback)
 
     # ===== SERIAL PROCESSING =====
     def connect(self) -> Statuses:

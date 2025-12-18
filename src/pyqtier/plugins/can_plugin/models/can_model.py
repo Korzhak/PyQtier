@@ -177,7 +177,7 @@ class CanModel(QObject):
             from PyQt5.QtCore import QTimer
             self._timer = QTimer()
             self._timer.timeout.connect(self._check_messages)
-            self._timer.start(10)  # Перевіряти кожні 10мс
+            self._timer.start(500)  # Перевіряти кожні 10мс
 
     def _stop_listener(self):
         """Зупинити прослуховування"""

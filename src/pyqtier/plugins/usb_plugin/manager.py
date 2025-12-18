@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import List
 
 from .auxiliary import *
 from .models.data_processor import UsbDataProcessor
@@ -26,75 +26,49 @@ class UsbPluginManager(PyQtierPlugin):
 
         self._serial: SerialModel = SerialModel()
 
-        self._external_lost_connection_callback: Optional[Callable] = None
-
     def setup_view(self, *args, **kwargs):
         super().setup_view(*args, **kwargs)
-        self._serial.devices_list_updated.connect(self._cb_list_usb_devices_callback)
-        self._cb_list_usb_devices_callback()
+
+        self._serial.devices_list_updated.connect(self._update_devices_list)
+        self._update_devices_list()
 
         if self._with_baudrate:
             self._ui.cb_list_baud_rates.addItems(BAUDRATES_LIST)
             self._ui.cb_list_baud_rates.setCurrentIndex(BAUDRATES_LIST.index(str(self._default_baudrate)))
+
+        self._serial.connect_signal.connect(self._on_connected)
+        self._serial.disconnect_signal.connect(self._on_disconnected)
+        self._serial.connection_lost.connect(self._on_connection_lost)
 
         self.create_behavior()
 
     def create_behavior(self):
         self._ui.bt_connect_disconnect.clicked.connect(self._connect_disconnect_callback)
 
+    # ===== PUBLIC METHODS =====
+
     def send_data(self, data: dict):
         self._serial.write(data)
-
-    # ===== SETTERS =====
-    def set_obtain_data_callback(self, callback):
-        self._serial.set_data_ready_callback(callback)
-
-    def set_error_callback(self, callback):
-        self._serial.set_error_callback(callback)
-
-    def set_connection_lost_callback(self, callback):
-        self._external_lost_connection_callback = callback
-        self._serial.set_connection_lost_callback(self._lost_connection_callback)
-
-    def set_connect_callback(self, callback: Callable):
-        self._serial.set_connect_callback(callback)
-
-    def set_disconnect_callback(self, callback: Callable):
-        self._serial.set_disconnect_callback(callback)
 
     def set_data_processor(self, data_processor: UsbDataProcessor):
         self._serial.set_data_processor(data_processor)
 
-    # ===== INTERNAL METHODS =====
+    # ===== INNER METHODS =====
+
     def _connect(self):
-        # Connecting
         self._serial.set_serial_port(self._ui.cb_list_usb_devices.currentText().split(" - ")[0])
-        # Setting baud rate if it enabled
+
         if self._with_baudrate:
             self._serial.set_baud_rate(int(self._ui.cb_list_baud_rates.currentText()))
 
-        # Checking if connecting successfully
-        if self._serial.connect() == Statuses.OK:
-            # self.bt_com.setIcon(self.__icon_com_disconnect)
-            self._ui.bt_connect_disconnect.setText("Disconnect")
+        if self._serial.connect() != Statuses.OK:
             if self._statusbar:
-                self._show_status_message(f"{self._ui.cb_list_usb_devices.currentText()} connected!")
-
-        else:
-            if self._statusbar:
-                self._show_status_message(f"{self._ui.cb_list_usb_devices.currentText()} connection failure!")
-            # Updating list of device if connecting failure
-            self._cb_list_usb_devices_callback()
+                self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} connection failure!", 4000)
+            self._update_devices_list()
 
     def _disconnect(self):
         if self._serial.is_connected:
             self._serial.disconnect()
-
-        # self.bt_com.setIcon(self.__icon_com_connect)
-        self._ui.bt_connect_disconnect.setText("Connect")
-
-        if self._statusbar:
-            self._show_status_message(f"{self._ui.cb_list_usb_devices.currentText()} disconnected!")
 
     def _connect_disconnect_callback(self):
         if self._serial.is_connected:
@@ -102,20 +76,63 @@ class UsbPluginManager(PyQtierPlugin):
         else:
             self._connect()
 
-    def _cb_list_usb_devices_callback(self):
+    def _update_devices_list(self, devices: List[str] = None):
         current_device = self._ui.cb_list_usb_devices.currentText()
-        available_devices = self._serial.get_available_ports()
+        available_devices = devices if devices else self._serial.get_available_ports()
+
         self._ui.cb_list_usb_devices.clear()
         self._ui.cb_list_usb_devices.addItems(available_devices)
+
         if current_device in available_devices:
             self._ui.cb_list_usb_devices.setCurrentIndex(available_devices.index(current_device))
 
-    def _show_status_message(self, message):
-        self._statusbar.showMessage(message, 4000)
+    def _on_connected(self):
+        self._ui.bt_connect_disconnect.setText("Disconnect")
+        if self._statusbar:
+            self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} connected!", 4000)
 
-    def _lost_connection_callback(self):
-        self._disconnect()
-        self._show_status_message("Connection lost!")
+    def _on_disconnected(self):
+        self._ui.bt_connect_disconnect.setText("Connect")
+        if self._statusbar:
+            self._statusbar.showMessage(f"{self._ui.cb_list_usb_devices.currentText()} disconnected!", 4000)
 
-        if self._external_lost_connection_callback:
-            self._external_lost_connection_callback()
+    def _on_connection_lost(self):
+        self._ui.bt_connect_disconnect.setText("Connect")
+        if self._statusbar:
+            self._statusbar.showMessage("USB: Connection lost!", 4000)
+
+    # ===== INFORMATION =====
+
+    @staticmethod
+    def get_available_ports() -> List[str]:
+        return SerialModel.get_available_ports()
+
+    # ===== ACCESS TO SIGNALS =====
+
+    @property
+    def connected(self):
+        return self._serial.connect_signal
+
+    @property
+    def disconnected(self):
+        return self._serial.disconnect_signal
+
+    @property
+    def error_occurred(self):
+        return self._serial.error_occurred
+
+    @property
+    def connection_lost(self):
+        return self._serial.connection_lost
+
+    @property
+    def devices_list_updated(self):
+        return self._serial.devices_list_updated
+
+    @property
+    def raw_data_received(self):
+        return self._serial.raw_data_received
+
+    @property
+    def data_ready(self):
+        return self._serial.data_ready

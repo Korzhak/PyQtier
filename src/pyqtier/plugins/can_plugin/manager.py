@@ -45,6 +45,8 @@ class CanPluginManager(PyQtierPlugin):
     def create_behavior(self):
         self._ui.bt_connect_disconnect.clicked.connect(self._connect_disconnect_callback)
 
+    # ===== PUBLIC METHODS =====
+
     def send_data(self, data: dict):
         self._can.write(data)
 
@@ -108,7 +110,7 @@ class CanPluginManager(PyQtierPlugin):
         if self._statusbar:
             self._statusbar.showMessage("CAN: Connection lost!")
 
-    # ===== ІНФОРМАЦІЯ =====
+    # ===== INFORMATION =====
 
     def is_device_available(self) -> bool:
         return self._can.is_device_available()
@@ -116,7 +118,7 @@ class CanPluginManager(PyQtierPlugin):
     def get_adapter_info(self, device_id: int = 0) -> dict:
         return self._can.get_adapter_info(device_id)
 
-    # ===== ДОСТУП ДО СИГНАЛІВ =====
+    # ===== ACCESS TO SIGNALS =====
 
     @property
     def connected(self):
