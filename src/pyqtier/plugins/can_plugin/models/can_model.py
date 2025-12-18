@@ -1,37 +1,35 @@
 import can
-from typing import Callable, Optional, List
-from PyQt5.QtCore import QObject, pyqtSignal, QThread
+from typing import Optional
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 from .data_processor import CanDataProcessor
-
-
-class Statuses:
-    OK = "OK"
-    ERROR = "ERROR"
-    DISCONNECTED = "DISCONNECTED"
-    TIMEOUT = "TIMEOUT"
+from ..auxiliary import CanStatuses
 
 
 class CanModel(QObject):
-    devices_list_updated = pyqtSignal()
-    message_received = pyqtSignal(object)  # can.Message
+    connected = pyqtSignal()
+    disconnected = pyqtSignal()
+    connection_lost = pyqtSignal()
+    error_occurred = pyqtSignal(str)
+    devices_list_updated = pyqtSignal(list)
+    message_received = pyqtSignal(object)
+    data_ready = pyqtSignal(dict)
 
     def __init__(self):
         super().__init__()
         self._bus: Optional[can.Bus] = None
         self._interface: str = "systec"
         self._channel: int = 0
-        self._device_id: int = 0  # ID адаптера
+        self._device_id: int = 0
         self._bitrate: int = 500000
         self._is_connected: bool = False
 
         self._data_processor: Optional[CanDataProcessor] = None
-        self._data_ready_callback: Optional[Callable] = None
-        self._error_callback: Optional[Callable] = None
-        self._connection_lost_callback: Optional[Callable] = None
-        self._connect_callback: Optional[Callable] = None
-        self._disconnect_callback: Optional[Callable] = None
+        self._timer: Optional[QTimer] = None
 
-        self._listener_thread: Optional[QThread] = None
+        self._monitor_timer = QTimer(self)
+        self._monitor_timer.timeout.connect(self._check_device_availability)
+        self._monitor_timer.start(2000)
+        self._last_device_available: Optional[bool] = None
 
     def set_can_interface(self, device_available: bool):
         """Встановити параметри для підключення"""
@@ -47,12 +45,14 @@ class CanModel(QObject):
         """Встановити битрейт"""
         self._bitrate = bitrate
 
+    def set_data_processor(self, processor: CanDataProcessor):
+        self._data_processor = processor
+
     def connect(self) -> str:
         """Підключитися до Systec CAN адаптера"""
         try:
             from can.interfaces.systec.ucanbus import UcanBus
 
-            # Підключення через UcanBus
             self._bus = UcanBus(
                 device=self._device_id,
                 channel=self._channel,
@@ -60,18 +60,14 @@ class CanModel(QObject):
             )
             self._is_connected = True
 
-            # Запускаємо listener для прийому повідомлень
             self._start_listener()
+            self.connected.emit()
 
-            if self._connect_callback:
-                self._connect_callback()
-
-            return Statuses.OK
+            return CanStatuses.OK
 
         except Exception as e:
-            if self._error_callback:
-                self._error_callback(f"Systec CAN connection error: {str(e)}")
-            return Statuses.ERROR
+            self.error_occurred.emit(f"Systec CAN connection error: {str(e)}")
+            return CanStatuses.ERROR
 
     def disconnect(self):
         """Відключитися від CAN шини"""
@@ -81,9 +77,7 @@ class CanModel(QObject):
             self._bus = None
 
         self._is_connected = False
-
-        if self._disconnect_callback:
-            self._disconnect_callback()
+        self.disconnected.emit()
 
     def send_message(self, can_id: int, data: bytes, extended: bool = False):
         """Відправити CAN повідомлення"""
@@ -100,8 +94,7 @@ class CanModel(QObject):
             return True
 
         except Exception as e:
-            if self._error_callback:
-                self._error_callback(f"Send error: {str(e)}")
+            self.error_occurred.emit(f"Send error: {str(e)}")
             return False
 
     def write(self, data: dict):
@@ -122,8 +115,8 @@ class CanModel(QObject):
         if self._bus:
             try:
                 self._bus.set_filters([{"can_id": can_id, "can_mask": mask}])
-            except:
-                pass
+            except Exception as e:
+                self.error_occurred.emit(f"Filter error: {str(e)}")
 
     def is_device_available(self) -> bool:
         """Перевірити чи є доступний Systec пристрій (Device 0)"""
@@ -138,10 +131,7 @@ class CanModel(QObject):
 
     def get_device_status(self) -> str:
         """Отримати статус пристрою"""
-        if self.is_device_available():
-            return "Device Available"
-        else:
-            return "No Device Found"
+        return "Device Available" if self.is_device_available() else "No Device Found"
 
     def get_adapter_info(self, device_id: int = 0) -> dict:
         """Отримати детальну інформацію про адаптер"""
@@ -191,8 +181,9 @@ class CanModel(QObject):
 
     def _stop_listener(self):
         """Зупинити прослуховування"""
-        if hasattr(self, '_timer'):
+        if self._timer:
             self._timer.stop()
+            self._timer = None
 
     def _check_messages(self):
         """Перевірити нові повідомлення"""
@@ -200,41 +191,42 @@ class CanModel(QObject):
             return
 
         try:
-            message = self._bus.recv(timeout=0)  # Non-blocking
+            message = self._bus.recv(timeout=0)
             if message:
                 self.message_received.emit(message)
 
-                message
                 if self._data_processor:
                     processed_data = self._data_processor.parse(message)
-                    if processed_data and self._data_ready_callback:
-                        self._data_ready_callback(processed_data)
+                    if processed_data:
+                        self.data_ready.emit(processed_data)
 
         except Exception as e:
-            # Можливо втрачено з'єднання
             if "disconnected" in str(e).lower():
-                if self._connection_lost_callback:
-                    self._connection_lost_callback()
+                self._handle_connection_lost()
+
+    def _handle_connection_lost(self):
+        self._stop_listener()
+
+        if self._bus:
+            try:
+                self._bus.shutdown()
+            except:
+                pass
+            self._bus = None
+
+        self._is_connected = False
+        self.connection_lost.emit()
+
+    def _check_device_availability(self):
+        current_available = self.is_device_available()
+
+        if self._last_device_available != current_available:
+            self._last_device_available = current_available
+            self.devices_list_updated.emit([current_available])
+
+        if self._is_connected and not current_available:
+            self._handle_connection_lost()
 
     @property
     def is_connected(self) -> bool:
         return self._is_connected
-
-    # Setters для callbacks
-    def set_data_processor(self, processor: CanDataProcessor):
-        self._data_processor = processor
-
-    def set_data_ready_callback(self, callback: Callable):
-        self._data_ready_callback = callback
-
-    def set_error_callback(self, callback: Callable):
-        self._error_callback = callback
-
-    def set_connection_lost_callback(self, callback: Callable):
-        self._connection_lost_callback = callback
-
-    def set_connect_callback(self, callback: Callable):
-        self._connect_callback = callback
-
-    def set_disconnect_callback(self, callback: Callable):
-        self._disconnect_callback = callback
