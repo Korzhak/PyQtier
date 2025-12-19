@@ -1,6 +1,3 @@
-from tarfile import data_filter
-
-
 class CanDataProcessor(object):
     def __init__(self):
         ...

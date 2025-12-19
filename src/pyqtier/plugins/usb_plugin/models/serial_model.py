@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Optional
 
 import serial
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
@@ -160,7 +160,7 @@ class SerialModel(QThread):
                     serialized_data = self.data_processor.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
-                    return Statuses.DATA_PARSER_DID_NOT_SET
+                    return Statuses.DATA_PROCESSOR_DID_NOT_SET
             except serial.serialutil.SerialTimeoutException as err:
                 # Якщо COM-порту не знайдено - розриваємо зв'язок
                 self.error_occurred.emit(str(err))

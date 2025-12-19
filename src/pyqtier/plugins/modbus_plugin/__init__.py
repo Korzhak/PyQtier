@@ -1,1 +1,1 @@
-from .manager import ModbusPluginManager
+from .manager import ModbusPluginManager, ModbusDataProcessor

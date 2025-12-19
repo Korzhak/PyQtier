@@ -38,9 +38,6 @@ class ModbusModel(QObject):
     def set_baudrate(self, baudrate: int):
         self._baudrate = baudrate
 
-    def _emit_data(self, data: dict):
-        self.data_ready.emit(data)
-
     def connect(self) -> Statuses:
         try:
             self._client = ModbusSerialClient(

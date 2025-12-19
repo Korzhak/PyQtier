@@ -3,7 +3,7 @@ class UsbDataProcessor(object):
         ...
 
     def parse(self, data):
-        return data.decode()
+        return data.decode(errors='ignore')
 
     def serialize(self, data):
         return data.encode()

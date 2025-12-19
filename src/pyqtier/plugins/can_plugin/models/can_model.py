@@ -60,6 +60,8 @@ class CanModel(QObject):
             )
             self._is_connected = True
 
+            self._monitor_timer.stop()
+
             self._start_listener()
             self.connected.emit()
 
@@ -77,6 +79,8 @@ class CanModel(QObject):
             self._bus = None
 
         self._is_connected = False
+
+        self._monitor_timer.start(2000)
         self.disconnected.emit()
 
     def send_message(self, can_id: int, data: bytes, extended: bool = False):
@@ -174,10 +178,9 @@ class CanModel(QObject):
     def _start_listener(self):
         """Запустити прослуховування повідомлень"""
         if self._bus:
-            from PyQt5.QtCore import QTimer
             self._timer = QTimer()
             self._timer.timeout.connect(self._check_messages)
-            self._timer.start(500)  # Перевіряти кожні 10мс
+            self._timer.start(500)
 
     def _stop_listener(self):
         """Зупинити прослуховування"""
@@ -205,6 +208,7 @@ class CanModel(QObject):
                 self._handle_connection_lost()
 
     def _handle_connection_lost(self):
+        """Обробка втрати з'єднання"""
         self._stop_listener()
 
         if self._bus:
@@ -215,17 +219,16 @@ class CanModel(QObject):
             self._bus = None
 
         self._is_connected = False
+        self._monitor_timer.start(2000)
         self.connection_lost.emit()
 
     def _check_device_availability(self):
+        """Моніторинг доступності пристрою (працює тільки коли відключено)"""
         current_available = self.is_device_available()
 
         if self._last_device_available != current_available:
             self._last_device_available = current_available
             self.devices_list_updated.emit([current_available])
-
-        if self._is_connected and not current_available:
-            self._handle_connection_lost()
 
     @property
     def is_connected(self) -> bool:
