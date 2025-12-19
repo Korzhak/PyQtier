@@ -1,12 +1,14 @@
 from typing import Union, List
 from ..plugins import PyQtierPlugin
 from .models.modbus_model import ModbusModel
+from .models.data_processor import ModbusDataProcessor
 
 BAUDRATES_LIST = ["9600", "19200", "38400", "57600", "115200"]
 
 
 class ModbusPluginManager(PyQtierPlugin):
     def __init__(self, with_baudrate: bool = True, default_baudrate: int = 9600, default_slave_id: int = 1, custom_ui=None):
+        self._data_processor: ModbusDataProcessor = None
         super().__init__()
 
         if with_baudrate:
@@ -49,6 +51,14 @@ class ModbusPluginManager(PyQtierPlugin):
 
     def create_behavior(self):
         self._ui.bt_connect_disconnect.clicked.connect(self._connect_disconnect_callback)
+
+    def set_data_processor(self, data_processor: ModbusDataProcessor):
+        self._data_processor = data_processor
+        if hasattr(self._data_processor, 'set_modbus_manager'):
+            self._data_processor.set_modbus_manager(self)
+
+    def get_data_processor(self) -> ModbusDataProcessor:
+        return self._data_processor
 
     # ===== УНІВЕРСАЛЬНІ МЕТОДИ =====
 
@@ -167,15 +177,27 @@ class ModbusPluginManager(PyQtierPlugin):
             baudrate_info = f" @ {self._modbus._baudrate} baud" if self._with_baudrate else ""
             self._statusbar.showMessage(f"Modbus: Connected to {port}{baudrate_info}", 4000)
 
+        # Автоматичний запуск polling
+        if self._data_processor and hasattr(self._data_processor, 'start_polling'):
+            self._data_processor.start_polling()
+
     def _on_disconnected(self):
         self._ui.bt_connect_disconnect.setText("Connect")
         if self._statusbar:
             self._statusbar.showMessage("Modbus: Disconnected", 4000)
 
+        # Автоматична зупинка polling
+        if self._data_processor and hasattr(self._data_processor, 'stop_polling'):
+            self._data_processor.stop_polling()
+
     def _on_connection_lost(self):
         self._ui.bt_connect_disconnect.setText("Connect")
         if self._statusbar:
             self._statusbar.showMessage("Modbus: Connection lost!", 4000)
+
+        # Автоматична зупинка polling
+        if self._data_processor and hasattr(self._data_processor, 'stop_polling'):
+            self._data_processor.stop_polling()
 
     # ===== ІНФОРМАЦІЯ =====
 

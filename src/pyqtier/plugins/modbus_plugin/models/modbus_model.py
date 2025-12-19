@@ -250,15 +250,24 @@ class ModbusModel(QObject):
         """Перевірка списку портів і з'єднання"""
         current_ports = set(self.get_available_ports())
 
-        # Оновлення списку портів
         if current_ports != self._last_ports:
             self._last_ports = current_ports
             self.devices_list_updated.emit(list(current_ports))
 
-        # Перевірка з'єднання
         if self._is_connected and self._port not in current_ports:
-            self._is_connected = False
-            self.connection_lost.emit()
+            self._handle_connection_lost()
+
+    def _handle_connection_lost(self):
+        self._is_connected = False
+
+        if self._client:
+            try:
+                self._client.close()
+            except:
+                pass
+            self._client = None
+
+        self.connection_lost.emit()
 
     # ===== ВЛАСТИВОСТІ =====
 
