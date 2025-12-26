@@ -178,24 +178,29 @@ class CanModel(QObject):
     def _start_listener(self):
         """Запустити прослуховування повідомлень"""
         if self._bus:
-            self._timer = QTimer()
+            self._stop_listener()
+
+            self._timer = QTimer(self)
             self._timer.timeout.connect(self._check_messages)
-            self._timer.start(500)
+            self._timer.start(10)
 
     def _stop_listener(self):
         """Зупинити прослуховування"""
-        if self._timer:
+        if self._timer is not None:
             self._timer.stop()
             self._timer = None
 
     def _check_messages(self):
         """Перевірити нові повідомлення"""
-        if not self._bus:
+        if not self._bus or not self._is_connected:
             return
 
         try:
-            message = self._bus.recv(timeout=0)
-            if message:
+            while True:
+                message = self._bus.recv(timeout=0)
+                if message is None:
+                    break
+
                 self.message_received.emit(message)
 
                 if self._data_processor:
@@ -206,6 +211,8 @@ class CanModel(QObject):
         except Exception as e:
             if "disconnected" in str(e).lower():
                 self._handle_connection_lost()
+            else:
+                self.error_occurred.emit(f"Receive error: {str(e)}")
 
     def _handle_connection_lost(self):
         """Обробка втрати з'єднання"""
