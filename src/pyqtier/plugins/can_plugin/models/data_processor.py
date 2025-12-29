@@ -1,12 +1,12 @@
-class UsbDataProcessor(object):
+class CanDataProcessor(object):
     def __init__(self):
         ...
 
     def parse(self, data):
-        return data.decode(errors='ignore')
+        return data
 
     def serialize(self, data):
-        return data.encode()
+        return data
 
     @staticmethod
     def calculate_crc(data: bytes) -> int:

@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Optional
 
 import serial
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
@@ -27,7 +27,7 @@ class SerialModel(QThread):
     connection_lost = pyqtSignal()
     connect_signal = pyqtSignal()
     disconnect_signal = pyqtSignal()
-    devices_list_updated = pyqtSignal(list)  # New signal for device list updates
+    devices_list_updated = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -113,21 +113,6 @@ class SerialModel(QThread):
         self.raw_data_received.connect(self._parsing)
         self.data_processor = data_processor
 
-    def set_data_ready_callback(self, callback: Callable):
-        self.data_ready.connect(callback)
-
-    def set_error_callback(self, callback: Callable):
-        self.error_occurred.connect(callback)
-
-    def set_connection_lost_callback(self, callback: Callable):
-        self.connection_lost.connect(callback)
-
-    def set_connect_callback(self, callback: Callable):
-        self.connect_signal.connect(callback)
-
-    def set_disconnect_callback(self, callback: Callable):
-        self.disconnect_signal.connect(callback)
-
     # ===== SERIAL PROCESSING =====
     def connect(self) -> Statuses:
         """
@@ -175,7 +160,7 @@ class SerialModel(QThread):
                     serialized_data = self.data_processor.serialize(data)
                     return self._ser.write(serialized_data)
                 else:
-                    return Statuses.DATA_PARSER_DID_NOT_SET
+                    return Statuses.DATA_PROCESSOR_DID_NOT_SET
             except serial.serialutil.SerialTimeoutException as err:
                 # Якщо COM-порту не знайдено - розриваємо зв'язок
                 self.error_occurred.emit(str(err))
