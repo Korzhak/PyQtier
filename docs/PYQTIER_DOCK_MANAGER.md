@@ -1,6 +1,6 @@
 # PyQtierDockManager
 
-Менеджер док-віджетів на базі PyQtAds для PyQtier фреймворку.
+Менеджер док-віджетів на базі PyQtAds для PyQtier фреймворку. Напряму успадковує `ads.CDockManager`.
 
 ## Встановлення
 
@@ -17,10 +17,8 @@ from PyQtAds import ads
 
 class MainWindow(PyQtierMainWindow):
     def setup_view(self):
-        # Створення
-        self.dock_manager = PyQtierDockManager(self.view.main_frame)
-        self.dock_manager.setup_configuration()
-        self.view.main_layout.addWidget(self.dock_manager.get_widget())
+        # Створення (автоматично додається в layout батьківського віджета)
+        self.dock_manager = PyQtierDockManager(self.view.main_frame, style="dark")
 
         # Додавання доків
         self.dock_manager.add("Графік", self.plot_widget, ads.CenterDockWidgetArea)
@@ -29,6 +27,9 @@ class MainWindow(PyQtierMainWindow):
         # Меню "Вид" (опціонально)
         self.view_menu = self.view.menubar.addMenu("Вид")
         self.dock_manager.create_view_menu(self.view_menu)
+
+        # Реакція на зміну стану доків (опціонально)
+        self.dock_manager.state_changed.connect(self.on_dock_state_changed)
 
     def _save_additional_state(self):
         self.settings.setValue("docks", self.dock_manager.save_state())
@@ -62,25 +63,66 @@ self.view.menuView.addSeparator()
 self.dock_manager.create_view_menu(self.view.menuView)
 ```
 
+## Конструктор
+
+```python
+PyQtierDockManager(parent, style="dark", **flags)
+```
+
+- `parent` - батьківський віджет
+- `style` - тема: `"dark"`, `"light"` або власний CSS
+- `**flags` - перевизначення конфігурації (див. нижче)
+
+**Автододавання в layout:** Якщо `parent` вже має layout, dock manager автоматично додається в нього. Це працює з `PyQtierMainWindow`, де `main_frame` має layout.
+
+```python
+# PyQtierMainWindow - достатньо (layout є)
+self.dock_manager = PyQtierDockManager(self.view.main_frame)
+
+# Свій віджет без layout - потрібно вручну
+self.dock_manager = PyQtierDockManager(my_widget)
+my_layout.addWidget(self.dock_manager)
+```
+
+### Конфігурація за замовчуванням
+
+```python
+CONFIG_DEFAULTS = {
+    'OpaqueSplitterResize': True,
+    'XmlCompressionEnabled': False,
+    'DockAreaHasTabsMenuButton': False,
+    'DockAreaHasUndockButton': False,
+    'HideSingleCentralWidgetTitleBar': True,
+    'MiddleMouseButtonClosesTab': True,
+}
+```
+
+Перевизначення:
+```python
+dock_manager = PyQtierDockManager(parent, DockAreaHasUndockButton=True)
+```
+
 ## Методи
 
-| Метод                     | Опис |
-|---------------------------|------|
-| `setup(**flags)`          | Ініціалізація |
-| `get_widget()`            | Qt-віджет для layout |
-| `add(name, widget, area)` | Додати док |
-| `get(name)`               | Отримати док за назвою |
-| `is_open(name)`           | Чи відкритий |
-| `show(name)`              | Показати |
-| `hide(name)`              | Сховати |
-| `toggle(name, show)`      | Перемкнути |
-| `show_all()`              | Показати всі |
-| `hide_all()`              | Сховати всі |
-| `get_names()`             | Список назв |
-| `save_state()`            | Зберегти стан віджетів |
-| `restore_state(json)`     | Відновити стан віджетів |
-| `set_style(style)`        | Змінити тему |
-| `create_view_menu(menu)`  | Додати пункти в меню |
+| Метод                         | Опис |
+|-------------------------------|------|
+| `add(name, widget, area, into)` | Додати док |
+| `get(name)`                   | Отримати док за назвою |
+| `is_open(name)`               | Чи відкритий |
+| `show(name)`                  | Показати |
+| `hide(name)`                  | Сховати |
+| `toggle(name, show)`          | Перемкнути |
+| `show_all()`                  | Показати всі |
+| `hide_all()`                  | Сховати всі |
+| `all_docks()`                 | Словник всіх доків `{name: CDockWidget}` |
+| `get_names()`                 | Список назв всіх доків |
+| `open_names()`                | Список назв відкритих доків |
+| `closed_names()`              | Список назв закритих доків |
+| `save_state()`                | Зберегти стан (JSON) |
+| `restore_state(json)`         | Відновити стан |
+| `set_style(style)`            | Змінити тему |
+| `create_view_menu(menu)`      | Додати пункти в меню |
+
 
 ## Теми
 

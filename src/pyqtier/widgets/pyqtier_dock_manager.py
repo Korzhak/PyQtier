@@ -10,10 +10,16 @@ except ImportError:
     raise ImportError("PyQtAds is required. Install: pip install PyQtAds")
 
 
-class PyQtierDockManager(QObject):
-    state_changed = pyqtSignal()
-    dock_closed = pyqtSignal(str)
-    dock_opened = pyqtSignal(str)
+class PyQtierDockManager(ads.CDockManager):
+
+    CONFIG_DEFAULTS = {
+        'OpaqueSplitterResize': True,
+        'XmlCompressionEnabled': False,
+        'DockAreaHasTabsMenuButton': False,
+        'DockAreaHasUndockButton': False,
+        'HideSingleCentralWidgetTitleBar': True,
+        'MiddleMouseButtonClosesTab': True,
+    }
 
     DARK_STYLE = """
         /* Кнопка закриття на вкладці (приховано) */
@@ -67,42 +73,29 @@ class PyQtierDockManager(QObject):
         ads--CDockWidget > QScrollArea { border: none; }
     """
 
-    def __init__(self, parent: QWidget, style: str = "dark"):
-        super().__init__()
-        self._parent = parent
-        self._manager: Optional[ads.CDockManager] = None
-        self._docks: Dict[str, ads.CDockWidget] = {}
-        self._closed: set = set()
-        self._style = style
+    def __init__(self, parent: QWidget, style: str = "dark", **flags):
+        config = self.CONFIG_DEFAULTS.copy()
+        config.update(flags)
 
-    def setup_configuration(self, **flags) -> ads.CDockManager:
-        defaults = {
-            'OpaqueSplitterResize': True,
-            'XmlCompressionEnabled': False,
-            'DockAreaHasTabsMenuButton': False,
-            'DockAreaHasUndockButton': False,
-            'HideSingleCentralWidgetTitleBar': True,
-            'MiddleMouseButtonClosesTab': True,
-        }
-        defaults.update(flags)
-
-        for name, value in defaults.items():
+        for name, value in config.items():
             if hasattr(ads.CDockManager, name):
                 ads.CDockManager.setConfigFlag(getattr(ads.CDockManager, name), value)
 
-        self._manager = ads.CDockManager(self._parent)
+        super().__init__(parent)
+        self._docks: Dict[str, ads.CDockWidget] = {}
+        self._closed: set = set()
+        self._style = style
         self.set_style(self._style)
-        return self._manager
 
-    def get_widget(self) -> ads.CDockManager:
-        return self._manager
+        if parent.layout():
+            parent.layout().addWidget(self)
 
     def add(self, name: str, widget: QWidget, area=None, into: Optional[ads.CDockAreaWidget] = None) -> ads.CDockWidget:
         area = area or ads.RightDockWidgetArea
         dock = ads.CDockWidget(name)
         dock.setWidget(widget)
 
-        self._manager.addDockWidget(area, dock, into) if into else self._manager.addDockWidget(area, dock)
+        self.addDockWidget(area, dock, into) if into else self.addDockWidget(area, dock)
         self._docks[name] = dock
 
         dock.closed.connect(lambda: self._on_closed(name))
@@ -111,16 +104,12 @@ class PyQtierDockManager(QObject):
 
     def _on_closed(self, name: str):
         self._closed.add(name)
-        self.dock_closed.emit(name)
-        self.state_changed.emit()
 
     def _on_toggled(self, name: str, visible: bool):
         if visible:
             self._closed.discard(name)
-            self.dock_opened.emit(name)
         else:
             self._closed.add(name)
-            self.dock_closed.emit(name)
 
     def get(self, name: str) -> Optional[ads.CDockWidget]:
         return self._docks.get(name)
@@ -132,13 +121,12 @@ class PyQtierDockManager(QObject):
         if name not in self._docks:
             return
         if show:
-            self._manager.show()
+            super().show()
             self._docks[name].toggleView(True)
             self._closed.discard(name)
         else:
             self._docks[name].toggleView(False)
             self._closed.add(name)
-        self.state_changed.emit()
 
     def show(self, name: str):
         self.toggle(name, True)
@@ -147,18 +135,16 @@ class PyQtierDockManager(QObject):
         self.toggle(name, False)
 
     def show_all(self):
-        self._manager.show()
+        super().show()
         for name in self._docks:
             self._docks[name].toggleView(True)
             self._closed.discard(name)
-        self.state_changed.emit()
 
     def hide_all(self):
         for name in self._docks:
             self._docks[name].toggleView(False)
             self._closed.add(name)
-        self._manager.hide()
-        self.state_changed.emit()
+        super().hide()
 
     def all_docks(self) -> Dict[str, ads.CDockWidget]:
         return self._docks.copy()
@@ -174,7 +160,7 @@ class PyQtierDockManager(QObject):
 
     def save_state(self) -> str:
         return json.dumps({
-            'layout': self._manager.saveState().data().hex(),
+            'layout': self.saveState().data().hex(),
             'closed': list(self._closed)
         })
 
@@ -184,7 +170,7 @@ class PyQtierDockManager(QObject):
             self._closed = set(data.get('closed', []))
 
             if layout := data.get('layout'):
-                self._manager.restoreState(QByteArray(bytes.fromhex(layout)))
+                self.restoreState(QByteArray(bytes.fromhex(layout)))
 
             for name in self._closed:
                 if name in self._docks:
@@ -196,13 +182,13 @@ class PyQtierDockManager(QObject):
 
     def set_style(self, style: str):
         if style == "dark":
-            self._manager.setStyleSheet(self.DARK_STYLE)
+            self.setStyleSheet(self.DARK_STYLE)
         elif style == "light":
-            self._manager.setStyleSheet(self.LIGHT_STYLE)
+            self.setStyleSheet(self.LIGHT_STYLE)
         else:
-            self._manager.setStyleSheet(style)
+            self.setStyleSheet(style)
         self._style = style
-    
+
     def create_view_menu(self, menu):
         """Додає пункти керування доками в меню."""
         menu.addAction("Показати всі", self.show_all)
