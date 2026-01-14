@@ -75,7 +75,7 @@ class PyQtierDockManager(QObject):
         self._closed: set = set()
         self._style = style
 
-    def setup(self, **flags) -> ads.CDockManager:
+    def setup_configuration(self, **flags) -> ads.CDockManager:
         defaults = {
             'OpaqueSplitterResize': True,
             'XmlCompressionEnabled': False,

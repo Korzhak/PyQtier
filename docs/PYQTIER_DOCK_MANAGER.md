@@ -19,7 +19,7 @@ class MainWindow(PyQtierMainWindow):
     def setup_view(self):
         # Створення
         self.dock_manager = PyQtierDockManager(self.view.main_frame)
-        self.dock_manager.setup()
+        self.dock_manager.setup_configuration()
         self.view.main_layout.addWidget(self.dock_manager.get_widget())
 
         # Додавання доків
