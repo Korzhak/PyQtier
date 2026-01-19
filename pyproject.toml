@@ -1,8 +1,9 @@
 [project]
 name = "PyQtier"
-version = "1.2.0"
+version = "1.3.0"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
+    { name = "Yurii Solodzhuk", email = "yurii.solodzhuk@gmail.com" },
 ]
 description = "Make your onw desktop app faster"
 readme = "README.md"
@@ -23,7 +24,8 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "qt5-applications>=5.15.2.2.3",
     "qt5-tools>=5.15.2.1.3",
-    "pyserial>=3.5"
+    "pyserial>=3.5",
+    "PyQtAds>=3.8.1"
 ]
 
 [project.urls]
