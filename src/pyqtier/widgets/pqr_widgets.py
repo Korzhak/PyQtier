@@ -2,8 +2,10 @@ from PyQt5.QtWidgets import QWidget, QMainWindow
 from PyQt5.QtCore import QSettings, QResource
 from PyQt5.QtGui import QIcon
 
+from .notification_widget import NotificationMixin
 
-class PyQtierBase:
+
+class PyQtierBase(NotificationMixin):
     def __init__(self, view_class, configs):
         self.view = view_class()
         self.view.setupUi(self)
