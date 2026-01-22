@@ -14,12 +14,16 @@ class PyQtierPlugin:
         self._widget: Optional[QWidget] = None
         self._statusbar: Optional[QStatusBar] = None
 
-    def setup_view(self, widget: QWidget, statusbar: QStatusBar = None):
+    def setup_view(self, widget: QWidget = None, statusbar: QStatusBar = None):
+        if not widget:
+            widget = QWidget()
+            widget.setObjectName("device_widget")
+
         if not isinstance(widget, QWidget):
             raise TypeError("Widget must be of type QWidget")
 
-        if not isinstance(statusbar, QStatusBar):
-            raise TypeError("Widget must be of type QStatusBar")
+        if statusbar is not None and not isinstance(statusbar, QStatusBar):
+            raise TypeError("Statusbar must be of type QStatusBar")
 
         self._widget = widget
         self._statusbar = statusbar

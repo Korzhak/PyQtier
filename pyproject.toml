@@ -44,6 +44,7 @@ packages = [
     "pyqtier.scripts.generator_templates",
     "pyqtier.widgets",
     "pyqtier.views",
+    "pyqtier.static",
     "pyqtier.plugins",
     "pyqtier.plugins.can_plugin",
     "pyqtier.plugins.can_plugin.models",

@@ -9,6 +9,8 @@ try:
 except ImportError:
     raise ImportError("PyQtAds is required. Install: pip install PyQtAds")
 
+from pyqtier.static.qss import styles
+
 
 class PyQtierDockManager(ads.CDockManager):
 
@@ -20,58 +22,6 @@ class PyQtierDockManager(ads.CDockManager):
         'HideSingleCentralWidgetTitleBar': True,
         'MiddleMouseButtonClosesTab': True,
     }
-
-    DARK_STYLE = """
-        /* Кнопка закриття на вкладці (приховано) */
-        ads--CDockWidgetTab > QPushButton { max-width: 0; max-height: 0; padding: 0; margin: 0; border: none; }
-
-        /* Заголовок області доків (верхня панель з вкладками) */
-        ads--CDockAreaTitleBar { background: rgb(40,40,40); min-height: 15px; max-height: 15px; }
-
-        /* Кнопки в заголовку (закрити, меню) */
-        ads--CDockAreaTitleBar QAbstractButton { background: rgb(40,40,40); border: none; }
-
-        /* Текст неактивної вкладки */
-        ads--CDockWidgetTab QLabel { background: rgb(40,40,40); color: rgb(100,100,100); }
-
-        /* Фон вкладки */
-        ads--CDockWidgetTab { background: rgb(40,40,40); }
-
-        /* Текст активної вкладки */
-        ads--CDockWidgetTab[activeTab="true"] QLabel { color: white; }
-
-        /* Рамка навколо області доку */
-        ads--CDockAreaWidget { border: 1px solid rgb(40,40,40); border-radius: 4px; }
-
-        /* Контейнер вмісту доку */
-        ads--CDockWidget > QScrollArea { border: none; }
-    """
-
-    LIGHT_STYLE = """
-        /* Кнопка закриття на вкладці (приховано) */
-        ads--CDockWidgetTab > QPushButton { max-width: 0; max-height: 0; padding: 0; margin: 0; border: none; }
-
-        /* Заголовок області доків */
-        ads--CDockAreaTitleBar { background: rgb(240,240,240); min-height: 15px; max-height: 15px; }
-
-        /* Кнопки в заголовку */
-        ads--CDockAreaTitleBar QAbstractButton { background: rgb(240,240,240); border: none; }
-
-        /* Текст неактивної вкладки */
-        ads--CDockWidgetTab QLabel { background: rgb(240,240,240); color: rgb(100,100,100); }
-
-        /* Фон вкладки */
-        ads--CDockWidgetTab { background: rgb(240,240,240); }
-
-        /* Текст активної вкладки */
-        ads--CDockWidgetTab[activeTab="true"] QLabel { color: black; }
-
-        /* Рамка навколо області доку */
-        ads--CDockAreaWidget { border: 1px solid rgb(200,200,200); border-radius: 4px; }
-
-        /* Контейнер вмісту доку */
-        ads--CDockWidget > QScrollArea { border: none; }
-    """
 
     def __init__(self, parent: QWidget, style: str = "dark", **flags):
         config = self.CONFIG_DEFAULTS.copy()
@@ -182,19 +132,16 @@ class PyQtierDockManager(ads.CDockManager):
 
     def set_style(self, style: str):
         if style == "dark":
-            self.setStyleSheet(self.DARK_STYLE)
+            self.setStyleSheet(styles.DOCK_DARK_STYLE)
         elif style == "light":
-            self.setStyleSheet(self.LIGHT_STYLE)
+            self.setStyleSheet(styles.DOCK_LIGHT_STYLE)
         else:
             self.setStyleSheet(style)
         self._style = style
 
-    def create_view_menu(self, menu):
+    def create_view_menu(self, menu: QMenu):
         """Додає пункти керування доками в меню."""
-        menu.addAction("Показати всі", self.show_all)
-        menu.addAction("Сховати всі", self.hide_all)
         menu.addSeparator()
-
         self._dock_actions = {}
         for name in sorted(self.get_names()):
             action = menu.addAction(name)
@@ -202,6 +149,10 @@ class PyQtierDockManager(ads.CDockManager):
             action.setChecked(self.is_open(name))
             action.triggered.connect(lambda checked, n=name: self.toggle(n, checked))
             self._dock_actions[name] = action
+        menu.addSeparator()
+        menu.addAction("Показати всі", self.show_all)
+        menu.addAction("Сховати всі", self.hide_all)
+
 
         def update_checks():
             for name, action in self._dock_actions.items():
