@@ -1,6 +1,6 @@
 [project]
 name = "PyQtier"
-version = "1.4.1"
+version = "1.4.2"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
     { name = "Yurii Solodzhuk", email = "yurii.solodzhuk@gmail.com" },
@@ -45,6 +45,7 @@ packages = [
     "pyqtier.widgets",
     "pyqtier.views",
     "pyqtier.static",
+    "pyqtier.static.qss",
     "pyqtier.plugins",
     "pyqtier.plugins.can_plugin",
     "pyqtier.plugins.can_plugin.models",
@@ -59,6 +60,8 @@ packages = [
 
 [tool.setuptools.package-data]
 "pyqtier.scripts.generator_templates" = ["img/*.png"]
+"pyqtier.views" = ["templates/*.qrc"]
+"pyqtier.plugins.usb_plugin.views" = ["templates/*.ui"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
