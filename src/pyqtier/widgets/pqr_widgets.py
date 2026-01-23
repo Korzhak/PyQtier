@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QMainWindow
+from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication
 from PyQt5.QtCore import QSettings, QResource
 from PyQt5.QtGui import QIcon
 
@@ -24,7 +24,6 @@ class PyQtierBase(NotificationMixin):
     def closeEvent(self, event):
         self.settings.setValue("geometry", self.saveGeometry())
         self._save_additional_state()
-        QApplication.quit()
         event.accept()
 
     def showEvent(self, event):
@@ -60,3 +59,7 @@ class PyQtierMainWindow(PyQtierBase, QMainWindow):
         state = self.settings.value("state")
         if state:
             self.restoreState(state)
+
+    def closeEvent(self, event):
+        super().closeEvent(event)
+        QApplication.quit()
