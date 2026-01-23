@@ -51,15 +51,14 @@ ads.CenterDockWidgetArea  # Центр
 
 ## Меню "Вид"
 
-**Немає свого меню:**
+**Немає свого меню "Вид":**
 ```python
 self.view_menu = self.view.menubar.addMenu("Вид")
 self.dock_manager.create_view_menu(self.view_menu)
 ```
 
-**Є своє меню з UI файлу:**
+**Є своє меню "Вид" з UI файлу:**
 ```python
-self.view.menuView.addSeparator()
 self.dock_manager.create_view_menu(self.view.menuView)
 ```
 

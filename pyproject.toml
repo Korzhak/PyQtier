@@ -1,6 +1,6 @@
 [project]
 name = "PyQtier"
-version = "1.4.0"
+version = "1.4.1"
 authors = [
     { name = "Korzhak", email = "bohdan.korzhak@gmail.com" },
     { name = "Yurii Solodzhuk", email = "yurii.solodzhuk@gmail.com" },
@@ -44,6 +44,7 @@ packages = [
     "pyqtier.scripts.generator_templates",
     "pyqtier.widgets",
     "pyqtier.views",
+    "pyqtier.static",
     "pyqtier.plugins",
     "pyqtier.plugins.can_plugin",
     "pyqtier.plugins.can_plugin.models",

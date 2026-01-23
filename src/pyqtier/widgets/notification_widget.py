@@ -3,7 +3,7 @@ from PyQt5.QtCore import QTimer, QPropertyAnimation, QEasingCurve, Qt, QPoint
 from PyQt5.QtGui import QFont
 from typing import List
 
-from pyqtier.static.qss.styles import NOTIFICATION_STYLES
+from pyqtier.static.qss import styles
 
 
 class _Notification(QLabel):
@@ -17,7 +17,7 @@ class _Notification(QLabel):
         self.setFont(QFont('Segoe UI', 10, QFont.Bold))
         self.setWordWrap(True)
         self.setFixedWidth(330)
-        self.setStyleSheet(NOTIFICATION_STYLES.get(message_type, NOTIFICATION_STYLES['info']))
+        self.setStyleSheet(styles.NOTIFICATION_STYLES.get(message_type, styles.NOTIFICATION_STYLES['info']))
         self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         self.opacity_effect = QGraphicsOpacityEffect()

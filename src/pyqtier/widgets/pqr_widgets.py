@@ -24,6 +24,7 @@ class PyQtierBase(NotificationMixin):
     def closeEvent(self, event):
         self.settings.setValue("geometry", self.saveGeometry())
         self._save_additional_state()
+        QApplication.quit()
         event.accept()
 
     def showEvent(self, event):
