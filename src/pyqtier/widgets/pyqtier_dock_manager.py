@@ -2,7 +2,7 @@ import json
 from typing import Dict, List, Optional
 
 from PyQt5.QtCore import QByteArray, QObject, pyqtSignal
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QMenu
 
 try:
     from PyQtAds import ads
