@@ -12,11 +12,23 @@ providing convenient commands for project creation, UI file conversion, and Qt D
 - Qt Designer integration
 - Automatic UI and resource file conversion
 - Project scaffolding and architecture solutions
+- Modular plugin system for Serial, CAN, and Modbus communication
 
 ## Installation
-
 ```bash
+# Base installation (no communication protocols)
 pip install pyqtier
+
+# With specific protocol support
+pip install pyqtier[serial]      # Serial/USB communication
+pip install pyqtier[can]         # CAN bus support
+pip install pyqtier[modbus]      # Modbus RTU/TCP support
+
+# Multiple protocols
+pip install pyqtier[serial,modbus]
+
+# All protocols
+pip install pyqtier[all]
 ```
 
 ## Commands
@@ -26,7 +38,6 @@ pip install pyqtier
 ### Start a New Project
 
 Create a new PyQt5 project structure:
-
 ```bash
 pyqtier startproject PROJECT_NAME
 ```
@@ -36,7 +47,6 @@ pyqtier startproject PROJECT_NAME
 ### Open Qt Designer
 
 Launch Qt Designer for creating UI files:
-
 ```bash
 pyqtier designer
 ```
@@ -46,7 +56,6 @@ Note: Requires `qt5-tools` to be installed on your system.
 ### Convert UI Files
 
 Convert Qt Designer `.ui` files to Python `.py` files:
-
 ```bash
 # Convert all .ui files in the project
 pyqtier convertui
@@ -61,7 +70,6 @@ pyqtier convertui --autorc
 ### Convert Resource Files
 
 Convert Qt resource `.qrc` files to Python `.py` files:
-
 ```bash
 # Convert all .qrc files in the project
 pyqtier convertqrc
@@ -73,17 +81,17 @@ pyqtier convertqrc filename.qrc
 ## Examples
 
 1. Create a new project:
-   ```bash
+```bash
    pyqtier startproject .
-   ```
+```
 
 2. Design your UI:
-   ```bash
+```bash
    pyqtier designer
-   ```
+```
 
 3. Convert UI and resource files:
-   ```bash
+```bash
    # Convert all UI files and automatically convert QRC files
    pyqtier convertui --autorc
    
@@ -92,17 +100,21 @@ pyqtier convertqrc filename.qrc
    
    # Convert a specific resource file
    pyqtier convertqrc resources.qrc
-   ```
+```
 
 ## Requirements
 
-- Python 3.x
+- Python 3.11+
 - PyQt5
-- qt5-tools (for Qt Designer)
-- click (for CLI interface)
+
+### Optional Dependencies
+
+| Extra | Package | Description |
+|-------|---------|-------------|
+| `serial` | pyserial | Serial/USB communication |
+| `can` | python-can | CAN bus interface |
+| `modbus` | pymodbus | Modbus RTU/TCP protocol |
 
 ## License
 
 **MIT**
-
-
